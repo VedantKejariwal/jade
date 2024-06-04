@@ -65,7 +65,7 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
         elif ctype == 'application/x-www-form-urlencoded':
             length = int(self.headers['content-length'])
             content = self.rfile.read(length)
-            for k,v in cgi.parse_qs(content, keep_blank_values=1).items():
+            for k,v in urllib.parse.parse_qs(content, keep_blank_values=1).items():
                 # python3 returns everything as bytes, so decode into strings
                 if type(k) == bytes: k = k.decode()
                 postvars[k] = [s.decode() if type(s) == bytes else s for s in v]
@@ -94,7 +94,9 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
         self.send_header("Content-type", 'text/plain')
         self.send_header("Content-Length", str(len(response)))
         self.end_headers()
-        self.wfile.write(response.encode())
+        if (type(response) == str):
+            response = response.encode('utf-8')
+        self.wfile.write(response)
 
     def guess_type(self, path):
         base, ext = posixpath.splitext(path)
