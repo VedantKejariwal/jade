@@ -31,7 +31,7 @@ jade_defs.services = function (jade) {
             dataType: 'text',
             data: {key: window.location.pathname, value: JSON.stringify(j.get_state())},
             error: function(jqXHR, textStatus, errorThrown) {
-                console.log('Error: '+errorThrown);
+                //console.log('Error: '+errorThrown);
             },
             success: function(result) {
                 if (callback) callback();
@@ -49,7 +49,7 @@ jade_defs.services = function (jade) {
             dataType: 'text',
             data: {key: window.location.pathname},
             error: function(jqXHR, textStatus, errorThrown) {
-                console.log('Error: '+errorThrown);
+                //console.log('Error: '+errorThrown);
             },
             success: function(result) {
                 //localStorage.setItem(window.location.pathname,result);
