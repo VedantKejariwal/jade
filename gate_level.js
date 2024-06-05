@@ -95,7 +95,7 @@ jade_defs.gate_level = function(jade) {
         });
 
         //console.log(JSON.stringify(netlist));
-        //jade.netlist.print_netlist(revised_netlist);
+        jade.netlist.print_netlist(revised_netlist);
 
         return revised_netlist;
     }
