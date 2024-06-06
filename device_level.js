@@ -259,7 +259,7 @@ jade_defs.device_level = function(jade) {
     }
 
     // add DC analysis to tool bar
-    jade.schematic_view.schematic_tools.push(['DC', jade.icons.dc_icon, 'DC Analysis', dc_analysis]);
+    //jade.schematic_view.schematic_tools.push(['DC', jade.icons.dc_icon, 'DC Analysis', dc_analysis]);
 
     ///////////////////////////////////////////////////////////////////////////////
     //
@@ -409,7 +409,7 @@ jade_defs.device_level = function(jade) {
 
 
     // add DC sweep to tool bar
-    jade.schematic_view.schematic_tools.push(['sweep', jade.icons.sweep_icon, 'DC Sweep for 1 or 2 sources', setup_dc_sweep]);
+    //jade.schematic_view.schematic_tools.push(['sweep', jade.icons.sweep_icon, 'DC Sweep for 1 or 2 sources', setup_dc_sweep]);
 
     ///////////////////////////////////////////////////////////////////////////////
     //
@@ -659,7 +659,7 @@ jade_defs.device_level = function(jade) {
     }
 
     // add AC analysis to tool bar
-    jade.schematic_view.schematic_tools.push(['AC', jade.icons.ac_icon, 'AC Analysis', setup_ac_analysis]);
+    //jade.schematic_view.schematic_tools.push(['AC', jade.icons.ac_icon, 'AC Analysis', setup_ac_analysis]);
 
     ///////////////////////////////////////////////////////////////////////////////
     //
@@ -805,7 +805,7 @@ jade_defs.device_level = function(jade) {
     }
 
     // add transient analysis to tool bar
-    jade.schematic_view.schematic_tools.push(['tran', jade.icons.tran_icon, 'Device-level Simulation (transient analysis)', setup_transient_analysis]);
+    //jade.schematic_view.schematic_tools.push(['tran', jade.icons.tran_icon, 'Device-level Simulation (transient analysis)', setup_transient_analysis]);
 
     ///////////////////////////////////////////////////////////////////////////////
     //
