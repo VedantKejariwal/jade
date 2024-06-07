@@ -18,8 +18,19 @@ import json
 import atexit
 import urllib
 
-jsonfile = 'labs.json'
-PORT = 8000
+jsonfile = input("Enter the name of the json file to use (leave blank for default 'labs.json'): ")
+if jsonfile == '': jsonfile = 'labs.json'
+
+PORT = input("Enter the port number to use (leave blank for default 8000): ")
+if PORT == '': PORT = 8000
+else: 
+    try:
+        PORT = int(PORT)
+    except ValueError:
+        print("WARNING: Invalid port number, using default port 8000")
+        PORT = 8000
+
+print(f"INFO: Loading {jsonfile} in directory {os.getcwd()}")
 
 class JadeRequestHandler(BaseHTTPRequestHandler):
     def log_message(self,format,*args):
@@ -75,8 +86,15 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
         self.log_message('%s',json.dumps([key,value]))
         
         # read json file with user's state
-        with open(jsonfile,'r') as f:
-            labs = json.load(f)
+        try: 
+            with open(jsonfile,'r') as f:
+                labs = json.load(f)
+        except json.JSONDecodeError:
+            print("ERROR: JSON file is not formatted correctly. Is this the correct file?")
+            exit()
+        except Exception as e:
+            print("ERROR: An error occurred while reading the JSON file:",e)
+            exit()
 
         response = ''
         if value is None:
@@ -119,10 +137,16 @@ httpd = socketserver.TCPServer(("",PORT),JadeRequestHandler)
 
 def cleanup():
   # free the socket
-  print("CLEANING UP!")
+  print("INFO: CLEANING UP!")
   httpd.shutdown()
-  print("CLEANED UP")
+  print("INFO: CLEANED UP")
 
+if (os.path.exists(jsonfile) == False):
+    print("ERROR: No JSON file found, are you sure you entered the correct name / directory?")
+    exit()
+else:
+    print("INFO: Requested file found, starting server...")
 atexit.register(cleanup)
-print("Jade Server: port",PORT)
+print("INFO: Jade Server: port",PORT)
+print(f"INFO: Access Jade in a web browser here: http://localhost:{PORT}/jade.html")
 httpd.serve_forever()
