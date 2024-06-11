@@ -49,7 +49,8 @@ jade_defs.services = function (jade) {
             dataType: 'text',
             data: {key: window.location.pathname},
             error: function(jqXHR, textStatus, errorThrown) {
-                //console.log('Error: '+errorThrown);
+                console.log('Error: '+jqXHR.responseText);
+                alert('Error: '+jqXHR.responseText+' Please start the server again.');
             },
             success: function(result) {
                 //localStorage.setItem(window.location.pathname,result);
@@ -72,7 +73,8 @@ jade_defs.services = function (jade) {
             dataType: 'text',
             data: {key: window.location.pathname, name: filename},
             error: function(jqXHR, textStatus, errorThrown) {
-                //console.log('Error: '+errorThrown);
+                console.log('Error: '+jqXHR.responseText);
+                alert('Error: '+jqXHR.responseText);
             },
             success: function(result) {
                 //localStorage.setItem(window.location.pathname,result);

@@ -90,15 +90,32 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
         try: 
             global jsonfile
             if (name is not None):
+                savedFile = jsonfile
                 jsonfile = name
                 print(f"INFO: Switching to JSON file {jsonfile}")
             with open(jsonfile,'r') as f:
                 labs = json.load(f)
         except json.JSONDecodeError:
-            print("ERROR: JSON file is not formatted correctly. Is this the correct file?")
-            exit()
+            response = 'Bad JSON file format. Please check the JSON file and try again.'
+            self.send_response(422)
+            self.send_header("Content-type", 'text/plain')
+            self.send_header("Content-Length", str(len(response)))
+            self.end_headers()
+            if (type(response) == str):
+                response = response.encode('utf-8')
+            self.wfile.write(response)
+
+            if (name is not None): # JSON Switch failed, revert to saved file
+                jsonfile = savedFile
+                print(f"ERROR: JSON file {name} is not formatted correctly. Keeping {savedFile} as the current JSON file")
+                return
+            else: # Initial JSON file is not formatted correctly
+                print(f"ERROR: JSON file {jsonfile} is not formatted correctly. Please check the JSON file and try again.")
+                print("INFO: Terminating server...")
+                exit()
         except Exception as e:
-            print("ERROR: An error occurred while reading the JSON file:",e)
+            print("ERROR: A fatal error occurred while reading the JSON file:",e)
+            print("INFO: Terminating server...")
             exit()
 
         response = ''
