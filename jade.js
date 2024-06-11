@@ -61,6 +61,7 @@ jade_defs.top_level = function(jade) {
         // insert framework into DOM
         this.top_level = $('<div class="jade-top-level">' +
                            ' <div id="module-tools" class="jade-toolbar"></div>' +
+                           ' <div id="file-select" class="jade-toolbar"></div>' +
                            ' <div class="jade-tabs-div"></div>' +
                            ' <div class="jade-resize-icon"></div>' +
                            ' <div class="jade-version"><a href="#">'+version+'</a></div>' +
@@ -94,6 +95,9 @@ jade_defs.top_level = function(jade) {
             this.module_tools.append(this.module_tool(jade.icons.cloud_download_icon,'cloud-download','Dowload designs from the cloud',jade.cloud_download));
         }
 
+        this.file_select = this.top_level.find('#file-select');
+        this.file_select.append('<span>Change JSON File:</span><input id="file-select-input" type="file" accept=".json">');
+
         /*
         var mailto = $('<a href="#"><span class="fa fa-lg fa-envelope-o"></span>"');
         mailto.on('click',function (event) {
@@ -106,6 +110,11 @@ jade_defs.top_level = function(jade) {
 
         $('#module-select',this.module_tools).on('change',function () {
             owner.jade.edit($(this).val());
+        });
+
+        $('#file-select-input').on('change',function () {
+            const file = this.files[0];
+            jade.switch_json($('.jade')[0].jade, window.location.origin, file.name);
         });
 
         // now add a display tab for each registered editor
@@ -407,7 +416,7 @@ jade_defs.top_level = function(jade) {
         var w_extra = e.outerWidth(true) - e.width();
         var h_extra = e.outerHeight(true) - e.height();
         w -= w_extra;
-        h -= h_extra + $('#module-tools').outerHeight(true) + 
+        h -= h_extra + $('#module-tools').outerHeight(true) + $('#file-select').outerHeight(true) +
             $('.jade-tabs-div',e).outerHeight(true) +
             $('.jade-status',e).outerHeight(true);
 

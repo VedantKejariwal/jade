@@ -64,6 +64,29 @@ jade_defs.services = function (jade) {
         //console.log('cloud_download');
     };
 
+    jade.switch_json = function (j,url,filename) {
+        if (url === undefined) url = j.configuration.cloud_url;
+        var args = {
+            url: url,
+            type: 'POST',
+            dataType: 'text',
+            data: {key: window.location.pathname, name: filename},
+            error: function(jqXHR, textStatus, errorThrown) {
+                //console.log('Error: '+errorThrown);
+            },
+            success: function(result) {
+                //localStorage.setItem(window.location.pathname,result);
+                var config = {};
+                $.extend(config,initial_config);
+                if (result) $.extend(config,JSON.parse(result));
+                j.initialize(config);
+            }
+        };
+        $.ajax(args);
+
+        //console.log('switch_json');
+    };
+
     jade.unsaved_changes = function(which) {
     };
 

@@ -83,10 +83,15 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
 
         key = postvars.get('key',[None])[0]
         value = postvars.get('value',[None])[0]
+        name = postvars.get('name',[None])[0]
         self.log_message('%s',json.dumps([key,value]))
         
         # read json file with user's state
         try: 
+            global jsonfile
+            if (name is not None):
+                jsonfile = name
+                print(f"INFO: Switching to JSON file {jsonfile}")
             with open(jsonfile,'r') as f:
                 labs = json.load(f)
         except json.JSONDecodeError:
