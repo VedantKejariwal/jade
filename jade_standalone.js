@@ -82,6 +82,7 @@ jade_defs.services = function (jade) {
                 $.extend(config,initial_config);
                 if (result) $.extend(config,JSON.parse(result));
                 j.initialize(config);
+                window.location.reload();
             }
         };
         $.ajax(args);
