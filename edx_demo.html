@@ -43,6 +43,7 @@ var edx_demo = (function () {
     // perform default initialization
     function initialize(state) {
         if (input_field) input_field.val(state.value);
+        window.location.reload(); // Ensure module select is up to date.
     }
 
     // set up editor inside of div's with class "jade"
