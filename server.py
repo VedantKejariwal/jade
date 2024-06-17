@@ -84,6 +84,7 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
         key = postvars.get('key',[None])[0]
         value = postvars.get('value',[None])[0]
         name = postvars.get('name',[None])[0]
+        stop = postvars.get('stop',[None])[0]
         self.log_message('%s',json.dumps([key,value]))
         
         # read json file with user's state
@@ -137,6 +138,9 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
         if (type(response) == str):
             response = response.encode('utf-8')
         self.wfile.write(response)
+        if (stop is not None and stop == "TRUE"):
+            print("INFO: Request to stop web server received. Terminating web server...")
+            exit() # Assuming the server does in fact get shutdown, not really checking.
 
     def guess_type(self, path):
         base, ext = posixpath.splitext(path)

@@ -86,6 +86,7 @@ jade_defs.top_level = function(jade) {
         this.module_tools.append(this.module_tool(jade.icons.delete_module_icon,'delete-module','Delete current module',delete_module,'hierarchy-tool'));
         this.module_tools.append(this.module_tool(jade.icons.download_icon,'download-modules','Save modules to module clipboard',download_modules));
         this.module_tools.append(this.module_tool(jade.icons.upload_icon,'upload-modules','Select modules to load from module clipboard',upload_modules));
+        this.module_tools.append(this.module_tool(jade.icons.stop_icon,'stop','Stop the server',stop_server));
         // too dangerous!
         // this.module_tools.append(this.module_tool(jade.icons.recycle_icon,'start-over','Discard all work on this problem and start over',start_over));
         if (jade.cloud_upload) {
@@ -641,6 +642,10 @@ jade_defs.top_level = function(jade) {
         dialog('Start over?',
                $('<span>Click OK to discard all work on this problem and start over again.</span>'),
                restart,offset);
+    }
+
+    function stop_server(j) {
+        jade.stop_server(j, window.location.origin);
     }
 
     //////////////////////////////////////////////////////////////////////

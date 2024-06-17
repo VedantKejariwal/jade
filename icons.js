@@ -128,4 +128,9 @@ jade_defs.icons = function(jade) {
     jade.icons.cloud_download_icon = '<span class="fa fa-fw fa-lg fa-cloud-download"></span>';
     jade.icons.cloud_upload_icon = '<span class="fa fa-fw fa-lg fa-cloud-upload"></span>';
 
+    jade.icons.stop_icon = 
+    '<svg class="fa fa-fw fa-lg" style="line-height: 25px" width="16" height="16" viewBox="0 0 16 16">' +
+        '<polygon points="4,0.5 12,0.5 15.5,4 15.5,12 12,15.5 4,15.5 0.5,12 0.5,4 4,0.5" ' +
+        'fill="red" stroke="black" stroke-width="0.5"/>'
+    '</svg>';
 };

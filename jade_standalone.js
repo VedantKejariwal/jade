@@ -90,6 +90,24 @@ jade_defs.services = function (jade) {
         //console.log('switch_json');
     };
 
+    jade.stop_server = function(j,url) {
+        if (url === undefined) url = j.configuration.cloud_url;
+        var args = {
+            url: url,
+            type: 'POST',
+            dataType: 'text',
+            data: {key: window.location.pathname, stop: "TRUE"},
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log('Error during server shutdown: '+jqXHR.responseText);
+                alert('Error during server shutdown: '+jqXHR.responseText);
+            },
+            success: function(result) {
+                alert("Server successfully stopped. You may now close this window.")
+            }
+        };
+        $.ajax(args);
+    }
+
     jade.unsaved_changes = function(which) {
     };
 
