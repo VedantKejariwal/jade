@@ -102,6 +102,8 @@ Most elements, such as I/O ports, gates, etc., can be brought into a schematic b
 
 Note, for various assignments in CS210, you may need to name the inputs/outputs a certain way. This is so the test for the module knows where to send input signals and to collect data from the designated outputs. It may also be helpful to name the gates in some circumstances to make debugging easier.
 
+**IMPORTANT: Good news! Despite what the help.html file in this repository suggests, changes to your schematics are saved after every edit! No need to worry about manually saving your files.**
+
 See below for a visual tutorial utilizing an AND gate.
 
 ![First Schematic](./howto_imgs/first-schematic.gif)
