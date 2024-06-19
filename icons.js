@@ -133,4 +133,7 @@ jade_defs.icons = function(jade) {
         '<polygon points="4,0.5 12,0.5 15.5,4 15.5,12 12,15.5 4,15.5 0.5,12 0.5,4 4,0.5" ' +
         'fill="red" stroke="black" stroke-width="0.5"/>'
     '</svg>';
+
+    jade.icons.netlist_upload_icon = '<i class="fa fa-fw fa-lg fa-arrow-circle-up" aria-hidden="true"></i>';
+
 };

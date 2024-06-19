@@ -85,12 +85,19 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
         value = postvars.get('value',[None])[0]
         name = postvars.get('name',[None])[0]
         stop = postvars.get('stop',[None])[0]
+        netlist = postvars.get('netlist',[None])[0]
+        netlist_name = postvars.get('netlist_name',[None])[0]
         self.log_message('%s',json.dumps([key,value]))
         
         # read json file with user's state
         try: 
             global jsonfile
-            if (name is not None):
+            if (netlist is not None and netlist_name is not None):
+                netlist_name = netlist_name.replace('/','-')[1:] + '.json'
+                print("INFO: Saving netlist to file: ",netlist_name)
+                with open(netlist_name,'w') as f:
+                    f.write(netlist)
+            elif (name is not None):
                 savedFile = jsonfile
                 jsonfile = name
                 print(f"INFO: Switching to JSON file {jsonfile}")

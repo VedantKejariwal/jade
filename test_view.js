@@ -50,6 +50,11 @@ jade_defs.test_view = function(jade) {
                                               jade.icons.check_icon,
                                               'Check: run tests',
                                               do_test]);
+                                
+    jade.schematic_view.schematic_tools.push(['netlist-extract',
+                                                jade.icons.netlist_upload_icon,
+                                                'Extract Netlist',
+                                                extract_netlist]);
 
     function do_test(diagram) {
         var module = diagram.aspect.module;
@@ -70,6 +75,31 @@ jade_defs.test_view = function(jade) {
         }
 
         diagram.message('This module does not have a test!');
+    }
+
+    function extract_netlist(diagram) {
+        var module = diagram.aspect.module;
+        if (module) {
+            var globals = Object.getOwnPropertyNames({});  // all the power supplies are global
+            globals.push('gnd');
+            netlist = jade.gate_level.diagram_gate_netlist(diagram,globals);
+            url = diagram.editor.jade.configuration.cloud_url;
+                var args = {
+                    url: url,
+                    type: 'POST',
+                    dataType: 'text',
+                    data: {key: window.location.pathname, netlist: JSON.stringify(netlist), netlist_name: module.get_name()},
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log('Error: '+jqXHR.responseText);
+                        alert('Error: '+jqXHR.responseText);
+                    },
+                    success: function(result) {
+                        //localStorage.setItem(window.location.pathname,result);
+                        alert('Netlist uploaded to file '+module.get_name().replace(/\//g,'-').substr(1) + '.json');
+                    }
+                };
+                $.ajax(args);
+        }
     }
 
     function TestEditor(div, parent) {
@@ -473,8 +503,26 @@ jade_defs.test_view = function(jade) {
             globals.push('gnd');
             if (mode == 'device')
                 netlist = jade.device_level.diagram_device_netlist(diagram,globals);
-            else if (mode == 'gate')
+            else if (mode == 'gate') {
                 netlist = jade.gate_level.diagram_gate_netlist(diagram,globals);
+                console.log(JSON.stringify(netlist));
+                url = diagram.editor.jade.configuration.cloud_url;
+                var args = {
+                    url: url,
+                    type: 'POST',
+                    dataType: 'text',
+                    data: {key: window.location.pathname, netlist: JSON.stringify(netlist)},
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log('Error: '+jqXHR.responseText);
+                        alert('Error: '+jqXHR.responseText);
+                    },
+                    success: function(result) {
+                        //localStorage.setItem(window.location.pathname,result);
+                        alert('Netlist uploaded');
+                    }
+                };
+                $.ajax(args);
+            }
             else
                 throw 'Unrecognized simulation mode: '+mode;
         }
