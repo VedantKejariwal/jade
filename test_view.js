@@ -61,6 +61,7 @@ jade_defs.test_view = function(jade) {
         if (module) {
             if (module.has_aspect('test')) {
                 var test = module.aspect('test').components[0];
+                console.log(test);
                 if (test) {
                     run_tests(test.test,diagram,module);
 
@@ -100,6 +101,10 @@ jade_defs.test_view = function(jade) {
                 };
                 $.ajax(args);
         }
+    }
+
+    function express_test(netlist) {
+
     }
 
     function TestEditor(div, parent) {
@@ -503,26 +508,8 @@ jade_defs.test_view = function(jade) {
             globals.push('gnd');
             if (mode == 'device')
                 netlist = jade.device_level.diagram_device_netlist(diagram,globals);
-            else if (mode == 'gate') {
+            else if (mode == 'gate')
                 netlist = jade.gate_level.diagram_gate_netlist(diagram,globals);
-                console.log(JSON.stringify(netlist));
-                url = diagram.editor.jade.configuration.cloud_url;
-                var args = {
-                    url: url,
-                    type: 'POST',
-                    dataType: 'text',
-                    data: {key: window.location.pathname, netlist: JSON.stringify(netlist)},
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        console.log('Error: '+jqXHR.responseText);
-                        alert('Error: '+jqXHR.responseText);
-                    },
-                    success: function(result) {
-                        //localStorage.setItem(window.location.pathname,result);
-                        alert('Netlist uploaded');
-                    }
-                };
-                $.ajax(args);
-            }
             else
                 throw 'Unrecognized simulation mode: '+mode;
         }
