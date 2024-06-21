@@ -108,6 +108,23 @@ jade_defs.services = function (jade) {
         $.ajax(args);
     }
 
+    jade.module_upload = function (j,url) {
+        if (url === undefined) url = j.configuration.cloud_url;
+        var args = {
+            url: url,
+            type: 'POST',
+            dataType: 'text',
+            data: {key: window.location.pathname, value: JSON.stringify(j.get_state()), module: j.module['name']},
+            error: function(jqXHR, textStatus, errorThrown) {
+                //console.log('Error: '+errorThrown);
+            },
+            success: function(result) {
+                alert('Module saved to file '+j.module['name'].replace(/\//g,'-').substr(1) + '-save.json');
+            }
+        };
+        $.ajax(args);
+    };
+
     jade.unsaved_changes = function(which) {
     };
 

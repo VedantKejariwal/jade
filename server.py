@@ -87,16 +87,38 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
         stop = postvars.get('stop',[None])[0]
         netlist = postvars.get('netlist',[None])[0]
         netlist_name = postvars.get('netlist_name',[None])[0]
+        module = postvars.get('module',[None])[0]
         self.log_message('%s',json.dumps([key,value]))
         
         # read json file with user's state
         try: 
             global jsonfile
             if (netlist is not None and netlist_name is not None):
-                netlist_name = netlist_name.replace('/','-')[1:] + '.json'
+                netlist_name = netlist_name.replace('/','-')[1:] + '-netlist.json'
                 print("INFO: Saving netlist to file: ",netlist_name)
                 with open(netlist_name,'w') as f:
                     f.write(netlist)
+            elif (module is not None):
+                try:
+                    jsoncontent = {}
+                    with open(jsonfile,'r') as jsonfile_FP:
+                        jsoncontent = json.load(jsonfile_FP)
+                    
+                    jsoncontent = {k: v for k, v in jsoncontent.items() if k == "/jade.html"}
+                    
+                    inner_data = json.loads(jsoncontent["/jade.html"])
+                    inner_data["tests"] = {k: v for k, v in inner_data["tests"].items() if k == module}
+                    inner_data["state"] = {k: v for k, v in inner_data["state"].items() if k == module}
+                    
+                    jsoncontent["/jade.html"] = json.dumps(inner_data)
+                    new_file_name = module.replace('/','-')[1:] + '-save.json'
+                    
+                    with open(new_file_name,'w') as f:
+                        f.write(json.dumps(jsoncontent))
+                    
+                    print("INFO: Saved module info to file: ",new_file_name)
+                except Exception:
+                    print("ERROR: Could not save module info")
             elif (name is not None):
                 savedFile = jsonfile
                 jsonfile = name

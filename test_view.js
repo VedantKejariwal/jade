@@ -56,6 +56,12 @@ jade_defs.test_view = function(jade) {
                                                 'Extract Netlist',
                                                 extract_netlist]);
 
+    // Not actually used for testing, but placing here for convenient UI location.
+    jade.schematic_view.schematic_tools.push(['module-upload',
+                                                jade.icons.module_upload_icon,
+                                                'Save Current Module to a File',
+                                                module_upload]);                                            
+
     function do_test(diagram) {
         var module = diagram.aspect.module;
         if (module) {
@@ -96,15 +102,15 @@ jade_defs.test_view = function(jade) {
                     },
                     success: function(result) {
                         //localStorage.setItem(window.location.pathname,result);
-                        alert('Netlist uploaded to file '+module.get_name().replace(/\//g,'-').substr(1) + '.json');
+                        alert('Netlist uploaded to file '+module.get_name().replace(/\//g,'-').substr(1) + '-netlist.json');
                     }
                 };
                 $.ajax(args);
         }
     }
 
-    function express_test(netlist) {
-
+    function module_upload() {
+        jade.module_upload($('.jade')[0].jade, window.location.origin);
     }
 
     function TestEditor(div, parent) {

@@ -134,6 +134,8 @@ jade_defs.icons = function(jade) {
         'fill="red" stroke="black" stroke-width="0.5"/>'
     '</svg>';
 
-    jade.icons.netlist_upload_icon = '<i class="fa fa-fw fa-lg fa-arrow-circle-up" aria-hidden="true"></i>';
+    jade.icons.netlist_upload_icon = '<i class="fa fa-fw fa-lg fa-plug" aria-hidden="true"></i>'
+
+    jade.icons.module_upload_icon = '<i class="fa fa-fw fa-lg fa-arrow-circle-up" aria-hidden="true"></i>';
 
 };
