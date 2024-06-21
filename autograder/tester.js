@@ -238,6 +238,7 @@ function express_test(source,netlist) {
     if (errors.length != 0) {
         msg = '<li>'+errors.join('<li>');
         test_result = 'Error detected: invalid test specification'+msg;
+        process.exitCode = 1;
         return;
     }
 
@@ -260,6 +261,7 @@ function express_test(source,netlist) {
         msg = errors.join('\n');
         test_result = 'Error detected: '+msg;
         console.log('ERROR: '+test_result);
+        process.exitCode = 1;
         return;
     }
 
@@ -520,13 +522,15 @@ function express_test(source,netlist) {
             }
 
             msg = '';
-            msg += '<li>'+errors.join('<li>')+postscript;
+            msg += errors.join('\n')+postscript;
             test_result = 'Error detected: '+msg;
+            process.exitCode = 1;
         } else {
             // Benmark = 1e-10/(size_in_m**2 * simulation_time_in_s)
             var benmark = 1e-10/((results._network_.size*1e-12) * results._network_.time);
 
             test_result = 'passed '+ +benmark.toString();
+            // Exit code is 0 by default.
         }
     }
 
@@ -535,9 +539,11 @@ function express_test(source,netlist) {
         if (percent_complete === undefined) {
             if (typeof results == 'string') {
                 test_result = 'Error detected: '+results;
+                process.exitCode = 1;
             } else if (results instanceof Error) {
                 results = results.stack.split('\n').join('<br>');
                 test_result = 'Error detected: '+results.message;
+                process.exitCode = 1;
             } else {
                 // process results after giving UI a chance to update
                 var errors = verify_results(results);
@@ -563,6 +569,7 @@ function express_test(source,netlist) {
     } catch (e) {
         test_result = 'Error detected running simulation:<p>'+e;
         console.log('ERROR: Express Test Finished with Errors.');
+        process.exitCode = 1;
         setTimeout(function() {}, 1000);
         return;
     }
