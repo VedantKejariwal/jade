@@ -25,13 +25,23 @@ jade_defs.services = function (jade) {
 
     jade.cloud_upload = function (j,url,callback) {
         if (url === undefined) url = j.configuration.cloud_url;
+        const requestTime = Date();
         var args = {
             url: url,
             type: 'POST',
             dataType: 'text',
             data: {key: window.location.pathname, value: JSON.stringify(j.get_state())},
             error: function(jqXHR, textStatus, errorThrown) {
-                //console.log('Error: '+errorThrown);
+                if (jqXHR.status == 0) {
+                    const now = Date();
+                    alert(
+                        'ERROR: Could not connect to server. ' +
+                        'Your latest changes have not been saved to your device. ' +
+                        'Please start the python server again and refresh this page ' +
+                        'to continue. ' +
+                        '\n\nTime of Failed Edit:\n'+requestTime
+                        );
+                }
             },
             success: function(result) {
                 if (callback) callback();
