@@ -12,10 +12,12 @@ This is a working document and will be updated as new functionality is added and
    - [JSON File Switcher](#json-file-switcher)
    - [Views](#views)
    - [Schematic Tools](#schematic-tools)
+   - [Schematic Testing / Saving Tools](#schematic-testing--saving-tools)
    - [Schematic Viewer Tools](#schematic-viewer-tools)
 2. [How to Do Stuff on Your Server](#how-to-do-stuff-on-your-server)
    - [Starting The Server](#starting-the-server)
    - [Creating Your First Schematic](#creating-your-first-schematic)
+   - [Special Inputs](#special-inputs)
    - [Handling Multi-Bit Values](#handling-multi-bit-values)
    - [Switching JSON Files](#switching-json-files)
    - [Stopping The Server](#stopping-the-server)
@@ -70,6 +72,13 @@ This is a working document and will be updated as new functionality is added and
 18. **Text**: Adds a new text element to the schematic.
 19. **Test**: Run the current module's test and display the result of the test.
 
+### Schematic Testing / Saving Tools
+![Schematic Testing / Saving Tools](./howto_imgs/schematictools-test.png)
+
+1. **Test**: Run the current module's test and display the result of the test.
+2. **Extract Netlist**: Exports the netlist of the current module to a file. May be required for submitting some assignments in CS210.
+3. **Save Module to File**: Save the current module to a file. Useful for creating isolated copies of individual modules.
+
 ### Schematic Viewer Tools
 ![Schematic Viewer Tools](./howto_imgs/schematicviewtools.png)
 1. **Move**: Move the schematic viewer up, down, left, or right.
@@ -108,11 +117,18 @@ See below for a visual tutorial utilizing an AND gate.
 
 ![First Schematic](./howto_imgs/first-schematic.gif)
 
+### Special Inputs
+
+In addition to the specified inputs in test cases, there are certain inputs reserved by the Jade tool that may prove to be useful for certain assignments. A list of the available reserved inputs is shown below, just name your input accordingly and Jade should recognize it and act accordingly. 
+
+- GND: A connection to ground, equivalent to inputting a 0 bit.
+- VDD: A connection to a power supply, equivalent to inputting a 1 bit.
+
 ### Handling Multi-Bit Values
 
 By default, all inputs are assumed to be one-bit values: 0s or 1s. Similarly, all output values by default are assumed to be a singular "L" for low or "H" for high (representing a binary 0 and 1 respectively). However, there are some cases where you'll need to work with multi-bit inputs and outputs. For instance, the test for a module may declare a 32-bit input, and your schematic will need to account for all 32 bits. 
 
-Multi-bit functionality can be achieved by modifying the naming of various inputs and outputs. Assuming each input/output of a gate has the same number of bits, the gates will automatically duplicate to account for the increased bit width, so no need to rename the gates, but it may be helpful to double click on the connections between elements to specify the updated bit width.
+Multi-bit functionality can be achieved by modifying the naming of various inputs and outputs. Assuming each input/output of a gate has the same number of bits (or a multiple of the largest mutli-bit value in the gate), the gates will automatically duplicate to account for the increased bit width, so no need to rename the gates, but it may be helpful to double click on the connections between elements to specify the updated bit width.
 
 Here's the rundown of how you can use the naming scheme to leverage this functionality...
 
