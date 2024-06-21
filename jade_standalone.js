@@ -42,8 +42,8 @@ jade_defs.services = function (jade) {
                         '\n\nTime of Failed Edit:\n'+requestTime
                         );
                 } else { // server running, but error
-                    console.log('Error: '+jqXHR.responseText);
-                    alert('Error: '+jqXHR.responseText);
+                    console.log('Error processing edit: '+jqXHR.responseText);
+                    alert('Error processing edit: '+jqXHR.responseText);
                 }
             },
             success: function(result) {
@@ -80,14 +80,25 @@ jade_defs.services = function (jade) {
 
     jade.switch_json = function (j,url,filename) {
         if (url === undefined) url = j.configuration.cloud_url;
+        const requestTime = Date();
         var args = {
             url: url,
             type: 'POST',
             dataType: 'text',
             data: {key: window.location.pathname, name: filename},
             error: function(jqXHR, textStatus, errorThrown) {
-                console.log('Error: '+jqXHR.responseText);
-                alert('Error: '+jqXHR.responseText);
+                if (jqXHR.status == 0) { // server not running
+                    const now = Date();
+                    alert(
+                        'ERROR: Could not connect to server. ' +
+                        'Please start the python server again and refresh this page ' +
+                        'to continue. ' +
+                        '\n\nTime of Failed JSON Switch:\n'+requestTime
+                        );
+                } else { // server running, but error
+                    console.log('Error during JSON Switch: '+jqXHR.responseText);
+                    alert('Error during JSON Switch: '+jqXHR.responseText);
+                }
             },
             success: function(result) {
                 //localStorage.setItem(window.location.pathname,result);
@@ -105,14 +116,23 @@ jade_defs.services = function (jade) {
 
     jade.stop_server = function(j,url) {
         if (url === undefined) url = j.configuration.cloud_url;
+        const requestTime = Date();
         var args = {
             url: url,
             type: 'POST',
             dataType: 'text',
             data: {key: window.location.pathname, stop: "TRUE"},
             error: function(jqXHR, textStatus, errorThrown) {
-                console.log('Error during server shutdown: '+jqXHR.responseText);
-                alert('Error during server shutdown: '+jqXHR.responseText);
+                if (jqXHR.status == 0) { // server not running
+                    alert(
+                        'ERROR: Could not connect to server. ' +
+                        'The server has already been terminated. ' +
+                        '\n\nTime of Attempted Stop:\n'+requestTime
+                        );
+                } else { // server running, but error
+                    console.log('Error during server shutdown: '+jqXHR.responseText);
+                    alert('Error during server shutdown: '+jqXHR.responseText);
+                }
             },
             success: function(result) {
                 alert("Server successfully stopped. You may now close this window.")
@@ -123,13 +143,25 @@ jade_defs.services = function (jade) {
 
     jade.module_upload = function (j,url) {
         if (url === undefined) url = j.configuration.cloud_url;
+        const requestTime = Date();
         var args = {
             url: url,
             type: 'POST',
             dataType: 'text',
             data: {key: window.location.pathname, value: JSON.stringify(j.get_state()), module: j.module['name']},
             error: function(jqXHR, textStatus, errorThrown) {
-                //console.log('Error: '+errorThrown);
+                if (jqXHR.status == 0) { // server not running
+                    alert(
+                        'ERROR: Could not connect to server. ' +
+                        'The module has not been downloaded to your device ' +
+                        'Please start the python server again and refresh this page ' +
+                        'to continue. ' +
+                        '\n\nTime of Attempted Module Save:\n'+requestTime
+                        );
+                } else { // server running, but error
+                    console.log('Error during module save: '+jqXHR.responseText);
+                    alert('Error during module save: '+jqXHR.responseText);
+                }
             },
             success: function(result) {
                 alert('Module saved to file '+j.module['name'].replace(/\//g,'-').substr(1) + '-save.json');
