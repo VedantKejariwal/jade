@@ -32,7 +32,7 @@ jade_defs.services = function (jade) {
             dataType: 'text',
             data: {key: window.location.pathname, value: JSON.stringify(j.get_state())},
             error: function(jqXHR, textStatus, errorThrown) {
-                if (jqXHR.status == 0) {
+                if (jqXHR.status == 0) { // server not running
                     const now = Date();
                     alert(
                         'ERROR: Could not connect to server. ' +
@@ -41,6 +41,9 @@ jade_defs.services = function (jade) {
                         'to continue. ' +
                         '\n\nTime of Failed Edit:\n'+requestTime
                         );
+                } else { // server running, but error
+                    console.log('Error: '+jqXHR.responseText);
+                    alert('Error: '+jqXHR.responseText);
                 }
             },
             success: function(result) {
