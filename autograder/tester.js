@@ -257,12 +257,9 @@ function express_test(source,netlist) {
     Object.keys(log_signals).forEach(function(key,idx) {var n = log_signals[key]; check_node(n);});
 
     if (errors.length != 0) {
-        msg = '<li>'+errors.join('<li>');
-        jade.window('Errors in test specification',
-                    $('<div class="jade-alert"></div>').html(msg),
-                    $(diagram.canvas).offset());
-        //diagram.message('The following errors were found in the test specification:'+msg);
-        test_result = 'Error detected:'+msg;
+        msg = errors.join('\n');
+        test_result = 'Error detected: '+msg;
+        console.log('ERROR: '+test_result);
         return;
     }
 
@@ -311,6 +308,7 @@ function express_test(source,netlist) {
     });
 
     if (mode == 'device')
+        // How did we get here if we don't support device simulation?
         build_inputs_device(netlist,driven_signals,thresholds);
     else if (mode == 'gate')
         build_inputs_gate(netlist,driven_signals,thresholds);
@@ -440,6 +438,7 @@ function express_test(source,netlist) {
 
             // check observed value vs. expected value
             if (mode == 'device') {
+                // How did we get here if we don't support device simulation?
                 v = history === undefined ? undefined : jade.device_level.interpolate(test.t, history.xvalues, history.yvalues);
                 if (v === undefined ||
                     (test.v == 'L' && v > thresholds.Vil) ||
@@ -483,6 +482,7 @@ function express_test(source,netlist) {
         });
 
         // create log if requested
+        // TODO: Convert log signals to be compatible with express testing.
         var log = [];
         log_times.forEach(function (t,tindex) {
             var values = [];
