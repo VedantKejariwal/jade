@@ -81,48 +81,48 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
                 if type(k) == bytes: k = k.decode()
                 postvars[k] = [s.decode() if type(s) == bytes else s for s in v]
 
-        key = postvars.get('key',[None])[0]
-        value = postvars.get('value',[None])[0]
-        name = postvars.get('name',[None])[0]
-        stop = postvars.get('stop',[None])[0]
-        netlist = postvars.get('netlist',[None])[0]
-        netlist_name = postvars.get('netlist_name',[None])[0]
-        module = postvars.get('module',[None])[0]
+        key = postvars.get('key',[None])[0] # key / lab name in JSON file
+        value = postvars.get('value',[None])[0] # state for particular lab
+        name = postvars.get('name',[None])[0] # for JSON switcher, name of JSON to switch to
+        stop = postvars.get('stop',[None])[0] # signal to stop the server
+        netlist = postvars.get('netlist',[None])[0] # netlist contents to save
+        netlist_name = postvars.get('netlist_name',[None])[0] # name of new netlist file to save
+        module = postvars.get('module',[None])[0] # name of module to save for module upload
+        combine_name = postvars.get('combine_name',[None])[0] # name of new file to save for module combination
+        files = postvars.get('files',[None])[0] # list of files to combine
+        extra = postvars.get('extra',[None])[0] # additional info as needed for file combination
         self.log_message('%s',json.dumps([key,value]))
         
         # read json file with user's state
         try: 
             global jsonfile
+            # Netlist Extraction
             if (netlist is not None and netlist_name is not None):
                 netlist_name = netlist_name.replace('/','-')[1:] + '-netlist.json'
                 print("INFO: Saving netlist to file: ",netlist_name)
                 with open(netlist_name,'w') as f:
                     f.write(netlist)
+            # Module Extraction
             elif (module is not None):
                 try:
-                    jsoncontent = {}
-                    with open(jsonfile,'r') as jsonfile_FP:
-                        jsoncontent = json.load(jsonfile_FP)
-                    
-                    jsoncontent = {k: v for k, v in jsoncontent.items() if k == "/jade.html"}
-                    
-                    inner_data = json.loads(jsoncontent["/jade.html"])
-                    inner_data["tests"] = {k: v for k, v in inner_data["tests"].items() if k == module}
-                    inner_data["state"] = {k: v for k, v in inner_data["state"].items() if k == module}
-                    
-                    jsoncontent["/jade.html"] = json.dumps(inner_data)
-                    new_file_name = module.replace('/','-')[1:] + '-save.json'
-                    
-                    with open(new_file_name,'w') as f:
-                        f.write(json.dumps(jsoncontent))
-                    
-                    print("INFO: Saved module info to file: ",new_file_name)
-                except Exception:
-                    print("ERROR: Could not save module info")
+                    self.module_extraction(module)
+                except Exception as e:
+                    print("ERROR: Could not save module info", e)
+                    self.send_error(e)
+            # Module/File Combination
+            elif (combine_name is not None and files is not None):
+                try:
+                    self.module_combination(combine_name, files, extra)
+                    return
+                except Exception as e:
+                    print("ERROR: Could not combine files:",e)
+                    self.send_error(e)
+            # JSON Switcher
             elif (name is not None):
                 savedFile = jsonfile
                 jsonfile = name
                 print(f"INFO: Switching to JSON file {jsonfile}")
+            # Used in all operations, particularly when updating current state
             with open(jsonfile,'r') as f:
                 labs = json.load(f)
         except json.JSONDecodeError:
@@ -187,6 +187,115 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
     extensions_map.update({
         '': 'application/octet-stream', # Default
     })
+
+    def module_extraction(self, module):
+        jsoncontent = {}
+        with open(jsonfile,'r') as jsonfile_FP:
+            jsoncontent = json.load(jsonfile_FP)
+        
+        jsoncontent = {k: v for k, v in jsoncontent.items() if k == "/jade.html"}
+        
+        inner_data = json.loads(jsoncontent["/jade.html"])
+        inner_data["tests"] = {k: v for k, v in inner_data["tests"].items() if k == module}
+        inner_data["state"] = {k: v for k, v in inner_data["state"].items() if k == module}
+        
+        jsoncontent["/jade.html"] = json.dumps(inner_data)
+        new_file_name = module.replace('/','-')[1:] + '-save.json'
+        
+        with open(new_file_name,'w') as f:
+            f.write(json.dumps(jsoncontent))
+        
+        print("INFO: Saved module info to file: ",new_file_name)
+
+    def module_combination(self, file_name, files, extra):
+        module_names = {}
+        result_jsoncontent = {}
+        jsoncontent = {}
+        files = files[1:-2].replace('"','').split(',')
+
+        for file in files:
+            try:
+                with open(file,'r') as jsonfile_FP:
+                    jsoncontent = json.load(jsonfile_FP)
+            except FileNotFoundError:
+                raise Exception(f"File {file} not found. Please check the file names and try again.")
+            except json.JSONDecodeError:
+                raise Exception(f"File {file} is not formatted correctly. Please check the file and try again.")
+            except Exception as e:
+                raise Exception(e)
+            jsoncontent = {k: v for k, v in jsoncontent.items() if k == "/jade.html"}
+            innercontent = json.loads(jsoncontent["/jade.html"])
+
+            for key, value in innercontent["state"].items():
+                if key not in module_names:
+                    module_names[key] = {'filename': [file], 'count': 1}
+                else:
+                    module_names[key]['filename'].append(file)
+                    module_names[key]['count'] += 1
+
+        noConflicts = True
+        # Conflicts resolved by user in previous request
+        if extra is not None:
+            extra = json.loads(extra)
+            for key, value in module_names.items():
+                if module_names[key]['count'] != 1 and key in extra:
+                    module_names[key]['filename'] = [extra[key]]
+                    module_names[key]['count'] = 1
+
+        # No conflict resolutions available
+        else:
+            for key, value in module_names.items():
+                if value['count'] != 1 and noConflicts == True:
+                    noConflicts = False
+                    response = {"status": "CONFLICT", "conflicts": {key: [value['filename']]}}
+                    print(f"ERROR: Module {key} found in multiple files. Prompting user to resolve conflicts.")
+                elif value['count'] != 1:
+                    if key not in response['conflicts']:
+                        response['conflicts'][key] = [value['filename']]
+                    else:
+                        response['conflicts'][key].append(value['filename'])
+                    print(f"ERROR: Module {key} found in multiple files. Prompting user to resolve conflicts.")
+
+        if noConflicts:
+            result_jsoncontent = {"/jade.html": {"tests": {}, "state": {}, "last_saved": 0}} # Initialize JSON file
+            for module in module_names:
+                with open(module_names[module]['filename'][0],'r') as jsonfile_FP:
+                    jsoncontent = json.load(jsonfile_FP)
+
+                jsoncontent = {k: v for k, v in jsoncontent.items() if k == "/jade.html"}
+                innercontent = json.loads(jsoncontent["/jade.html"])
+
+                result_jsoncontent["/jade.html"]["tests"].update({k: v for k, v in innercontent["tests"].items() if k == module})
+                result_jsoncontent["/jade.html"]["state"].update({k: v for k, v in innercontent["state"].items() if k == module})
+
+            result_jsoncontent["/jade.html"] = json.dumps(result_jsoncontent["/jade.html"])
+            with open(file_name,'w') as f:
+                f.write(json.dumps(result_jsoncontent))
+            response = {"status": "SUCCESS", "filename": file_name}
+        
+        response = json.dumps(response)
+        response = str(response)
+        
+        if (noConflicts == True):
+            self.send_response(200)
+        else:
+            self.send_response(409)
+        self.send_header("Content-type", 'text/plain')
+        self.send_header("Content-Length", str(len(response)))
+        self.end_headers()
+        if (type(response) == str):
+            response = response.encode('utf-8')
+        self.wfile.write(response)
+
+    def send_error(self, e):
+        response = str(e)
+        self.send_response(400)
+        self.send_header("Content-type", 'text/plain')
+        self.send_header("Content-Length", str(len(response)))
+        self.end_headers()
+        if (type(response) == str):
+            response = response.encode('utf-8')
+        self.wfile.write(response)
         
 httpd = socketserver.TCPServer(("",PORT),JadeRequestHandler)
 

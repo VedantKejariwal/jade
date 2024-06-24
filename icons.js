@@ -136,6 +136,7 @@ jade_defs.icons = function(jade) {
 
     jade.icons.netlist_upload_icon = '<i class="fa fa-fw fa-lg fa-plug" aria-hidden="true"></i>'
 
-    jade.icons.module_upload_icon = '<i class="fa fa-fw fa-lg fa-arrow-circle-up" aria-hidden="true"></i>';
+    jade.icons.module_upload_icon = '<i class="fa fa-fw fa-lg fa-code-fork" aria-hidden="true"></i>';
 
+    jade.icons.module_combine_icon = '<i class="fa fa-fw fa-lg fa-cubes" aria-hidden="true"></i>';
 };

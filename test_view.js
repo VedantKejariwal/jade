@@ -60,7 +60,12 @@ jade_defs.test_view = function(jade) {
     jade.schematic_view.schematic_tools.push(['module-upload',
                                                 jade.icons.module_upload_icon,
                                                 'Save Current Module to a File',
-                                                module_upload]);                                            
+                                                module_upload]);
+                                                
+    jade.schematic_view.schematic_tools.push(['module-combine',
+                                                jade.icons.module_combine_icon,
+                                                'Combine JSON Modules to a Single File',
+                                                start_module_combine]);
 
     function do_test(diagram) {
         var module = diagram.aspect.module;
@@ -111,6 +116,10 @@ jade_defs.test_view = function(jade) {
 
     function module_upload() {
         jade.module_upload($('.jade')[0].jade, window.location.origin);
+    }
+
+    function start_module_combine() {
+        document.getElementById('multi-file-select-input').click();
     }
 
     function TestEditor(div, parent) {

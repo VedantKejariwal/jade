@@ -62,6 +62,7 @@ jade_defs.top_level = function(jade) {
         this.top_level = $('<div class="jade-top-level">' +
                            ' <div id="module-tools" class="jade-toolbar"></div>' +
                            ' <div id="file-select" class="jade-toolbar"></div>' +
+                           ' <div id="multi-file-select" style="display: none;"></div>' +
                            ' <div class="jade-tabs-div"></div>' +
                            ' <div class="jade-resize-icon"></div>' +
                            ' <div class="jade-version"><a href="#">'+version+'</a></div>' +
@@ -99,6 +100,9 @@ jade_defs.top_level = function(jade) {
         this.file_select = this.top_level.find('#file-select');
         this.file_select.append('<span>Change JSON File:</span><input id="file-select-input" type="file" accept=".json">');
 
+        this.multi_file_select = this.top_level.find('#multi-file-select');
+        this.multi_file_select.append('<span>Combine Modules/Files into Single File:</span><input id="multi-file-select-input" type="file" accept=".json" multiple>');
+
         /*
         var mailto = $('<a href="#"><span class="fa fa-lg fa-envelope-o"></span>"');
         mailto.on('click',function (event) {
@@ -116,6 +120,16 @@ jade_defs.top_level = function(jade) {
         $('#file-select-input').on('change',function () {
             const file = this.files[0];
             jade.switch_json($('.jade')[0].jade, window.location.origin, file.name);
+        });
+
+        $('#multi-file-select-input').on('change',function () {
+            const files = this.files;
+            const names = [];
+            for (var i = 0; i < files.length; i++) {names.push(files[i].name);}
+            console.log(names);
+            let new_name = prompt('Enter a name for the combined file:');
+            if (new_name === null) {return;}
+            jade.module_combine($('.jade')[0].jade, window.location.origin, new_name, names, undefined);
         });
 
         // now add a display tab for each registered editor

@@ -170,6 +170,73 @@ jade_defs.services = function (jade) {
         $.ajax(args);
     };
 
+    jade.module_combine = function (j,url,new_file_name,files,extra) {
+        if (url === undefined) url = j.configuration.cloud_url;
+        const requestTime = Date();
+        if (new_file_name === undefined) {
+            new_file_name = prompt('Please enter a name for the combined file');
+            if (new_file_name === null) {
+                alert('Operation cancelled. No changes have been made to your device.');
+                return;
+            }
+        }
+        // check if filename ends in .json
+        if (new_file_name.slice(-5) !== '.json') {
+            new_file_name += '.json';
+        }
+        var args = {
+            url: url,
+            type: 'POST',
+            dataType: 'text',
+            data: {key: window.location.pathname, 
+                value: JSON.stringify(j.get_state()), 
+                combine_name: new_file_name, 
+                files: JSON.stringify(files), 
+                extra: JSON.stringify(extra)
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == 0) { // server not running
+                    alert(
+                        'ERROR: Could not connect to server. ' +
+                        'No changes have been made to your device ' +
+                        'Please start the python server again and refresh this page ' +
+                        'to continue. ' +
+                        '\n\nTime of Attempted Module/File Combining:\n'+requestTime
+                        );
+                } else if (jqXHR.status == 409) {
+                    console.log("Conflict detected during module combination");
+                    let conflicts = JSON.parse(jqXHR.responseText).conflicts;
+                    let resolutions = {};
+                    // console.log(conflicts["/user/untitled"][0][0]); Gets an element from file array of conflict
+                    for (let module in conflicts) {
+                        let choices = "";
+                        for (let i = 0; i < conflicts[module][0].length; i++) {
+                            choices += "- " + conflicts[module][0][i] + "\n";
+                        }
+                        let choice = prompt(
+                            'Conflict detected for module \"'+ module +'\". Please confirm ' +
+                            'which file should be used by typing in the desired ' +
+                            'file\'s name from the conflicting files listed below:\n\n' + choices + '\n'
+                            );
+                        if (choice === null) {
+                            alert('Operation cancelled. No changes have been made to your device.');
+                            return;
+                        }
+                        resolutions[module] = choice;
+                    }
+                    jade.module_combine(j,url,new_file_name,files,resolutions);
+                } else { // server running, but error
+                    console.log('Error during combining of modules/files: '+jqXHR.responseText);
+                    alert('Error during combining of modules/files: '+jqXHR.responseText);
+                }
+            },
+            success: function(result) {
+                alert('Selected contents saved to file '+new_file_name);
+            }
+        };
+        $.ajax(args);
+    };
+
     jade.unsaved_changes = function(which) {
     };
 
