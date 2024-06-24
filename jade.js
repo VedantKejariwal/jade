@@ -126,7 +126,6 @@ jade_defs.top_level = function(jade) {
             const files = this.files;
             const names = [];
             for (var i = 0; i < files.length; i++) {names.push(files[i].name);}
-            console.log(names);
             let new_name = prompt('Enter a name for the combined file:');
             if (new_name === null) {return;}
             jade.module_combine($('.jade')[0].jade, window.location.origin, new_name, names, undefined);

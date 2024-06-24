@@ -78,6 +78,7 @@ This is a working document and will be updated as new functionality is added and
 1. **Test**: Run the current module's test and display the result of the test.
 2. **Extract Netlist**: Exports the netlist of the current module to a file. May be required for submitting some assignments in CS210.
 3. **Save Module to File**: Save the current module to a file. Useful for creating isolated copies of individual modules.
+4. **Combine Modules**: Select one or more files and consolidate all of their modules into a new JSON file. Existing files are unchanged.
 
 ### Schematic Viewer Tools
 ![Schematic Viewer Tools](./howto_imgs/schematicviewtools.png)

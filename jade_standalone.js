@@ -207,7 +207,7 @@ jade_defs.services = function (jade) {
                     console.log("Conflict detected during module combination");
                     let conflicts = JSON.parse(jqXHR.responseText).conflicts;
                     let resolutions = {};
-                    // console.log(conflicts["/user/untitled"][0][0]); Gets an element from file array of conflict
+                    
                     for (let module in conflicts) {
                         let choices = "";
                         for (let i = 0; i < conflicts[module][0].length; i++) {

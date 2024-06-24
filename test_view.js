@@ -64,7 +64,7 @@ jade_defs.test_view = function(jade) {
                                                 
     jade.schematic_view.schematic_tools.push(['module-combine',
                                                 jade.icons.module_combine_icon,
-                                                'Combine JSON Modules to a Single File',
+                                                'Combine Modules in JSON files to a Single File',
                                                 start_module_combine]);
 
     function do_test(diagram) {
@@ -72,7 +72,6 @@ jade_defs.test_view = function(jade) {
         if (module) {
             if (module.has_aspect('test')) {
                 var test = module.aspect('test').components[0];
-                console.log(test);
                 if (test) {
                     run_tests(test.test,diagram,module);
 

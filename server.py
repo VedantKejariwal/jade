@@ -108,7 +108,7 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
                     self.module_extraction(module)
                 except Exception as e:
                     print("ERROR: Could not save module info", e)
-                    self.send_error(e)
+                    self.generate_error(e, 400)
             # Module/File Combination
             elif (combine_name is not None and files is not None):
                 try:
@@ -116,7 +116,7 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
                     return
                 except Exception as e:
                     print("ERROR: Could not combine files:",e)
-                    self.send_error(e)
+                    self.generate_error(e, 400)
             # JSON Switcher
             elif (name is not None):
                 savedFile = jsonfile
@@ -278,6 +278,7 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
         
         if (noConflicts == True):
             self.send_response(200)
+            print("INFO: Saved combined file to: ",file_name)
         else:
             self.send_response(409)
         self.send_header("Content-type", 'text/plain')
@@ -287,9 +288,10 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
             response = response.encode('utf-8')
         self.wfile.write(response)
 
-    def send_error(self, e):
+    def generate_error(self, e, code):
+        print("ERROR: ",e)
         response = str(e)
-        self.send_response(400)
+        self.send_response(code)
         self.send_header("Content-type", 'text/plain')
         self.send_header("Content-Length", str(len(response)))
         self.end_headers()
