@@ -55,30 +55,31 @@ This is a working document and will be updated as new functionality is added and
 1. **Grid**: Enable/Disable the grid overlay.
 2. **Undo**: Reverts the previous action.
 3. **Redo**: Performs the operation that was previously undone.
-4. **Cut**: Remove the selected element from the schematic and save it to the clipboard. Can also use Ctrl-X or Cmd-X.
-5. **Copy**: Save the selected element from the schematic to the clipboard. Can also use Ctrl-C or Cmd-C.
-6. **Paste**: Add the saved element from the clipboard to the schematic. Can also use Ctrl-V or Cmd-V.
-7. **Horizontal Flip**: Flip the currently selected element horizontally.
-8. **Vertical Flip**: Flip the currently selected element vertically.
-9. **Rotate Clockwise**: Rotate the currently selected element 90 degrees clockwise.
-10. **Rotate Counterclockwise**: Rotate the currently selected element 90 degree counterclockwise.
-11. **Move Down in Hierarchy**: For supported schematics, move the selected element down/backwards in the hierarchy.
-12. **Move Up in Hierarchy**: For supported schematics, move the selected element up/forwards in the hierarchy.
-13. **Ground Connection**: Add a new ground connection element to the schematic. Unlikely to be used in CS210 assignments.
-14. **Power Supply Connection**: Add a new power supply connection to the schematic. Unlikely to be used in CS210 assignments.
+4. **Cut**: Remove the selected element(s) from the schematic and save it to the clipboard. Can also use Ctrl-X or Cmd-X.
+5. **Copy**: Save the selected element(s) from the schematic to the clipboard. Can also use Ctrl-C or Cmd-C.
+6. **Paste**: Add the saved element(s) from the clipboard to the schematic. Can also use Ctrl-V or Cmd-V.
+7. **Horizontal Flip**: Flip the currently selected element(s) horizontally.
+8. **Vertical Flip**: Flip the currently selected element(s) vertically.
+9. **Rotate Clockwise**: Rotate the currently selected element(s) 90 degrees clockwise.
+10. **Rotate Counterclockwise**: Rotate the currently selected element(s) 90 degree counterclockwise.
+11. **Move Down in Hierarchy**: For supported schematics, move the selected element(s) down/backwards in the hierarchy.
+12. **Move Up in Hierarchy**: For supported schematics, move the selected element(s) up/forwards in the hierarchy.
+13. **Ground Connection**: Add a new ground connection element to the schematic. Can also use [GND](#special-inputs) equivalent.
+14. **Power Supply Connection**: Add a new power supply connection to the schematic. Can also use [VDD](#special-inputs) equivalent.
 15. **Input/Output Port**: Add a new input/output element to the schematic.
 16. **Jumper**: Add a new jumper element to the schematic.
 17. **Multi-Port Memory**: Add a new Multi-Port Memory element to the schematic. Unlikely to be used in CS210 assignments.
 18. **Text**: Adds a new text element to the schematic.
-19. **Test**: Run the current module's test and display the result of the test.
 
 ### Schematic Testing / Saving Tools
 ![Schematic Testing / Saving Tools](./howto_imgs/schematictools-test.png)
 
+**IMPORTANT: All of the tools in this section that save files to the device will completely overwrite any existing file matching the file's name, so be sure to double check your files and make any copies as needed prior to performing the operation.**
+
 1. **Test**: Run the current module's test and display the result of the test.
-2. **Extract Netlist**: Exports the netlist of the current module to a file. May be required for submitting some assignments in CS210.
-3. **Save Module to File**: Save the current module to a file. Useful for creating isolated copies of individual modules.
-4. **Combine Modules**: Select one or more files and consolidate all of their modules into a new JSON file. Existing files are unchanged.
+2. **Extract Netlist**: Exports the netlist of the current module to a file, typically formatted as `user-untitled-netlist.json` for example, where user-untitled represents module "/user/untitled". May be required for submitting some assignments in CS210.
+3. **Save Module to File**: Save the current module to a file, typically formatted as `user-untitled-save.json` for example, where user-untitled represents module "/user/untitled". Useful for creating isolated copies of individual modules.
+4. **Combine Modules**: Select one or more files and consolidate all of their modules into a new JSON file with a name of your choosing. Existing files are unchanged.
 
 ### Schematic Viewer Tools
 ![Schematic Viewer Tools](./howto_imgs/schematicviewtools.png)
@@ -91,7 +92,7 @@ This is a working document and will be updated as new functionality is added and
 
 If you're reading this message, then you've likely already completed the first step of downloading or cloning the repository from GitHub. With that, you should have all the files needed to get things started.
 
-The only requirement is to make sure you have some version of Python 3 installed on your system in order to run the server.
+The only requirement is to make sure you have some version of Python 3 installed on your system in order to run the server. At time of writing, Python 3.13 is currently not supported with this program due to compatibility issues.
 
 ### Starting The Server
 First things first: run the server.py python file. You can do this through a terminal (seen below) or pressing 'Run' in certain code editors and IDEs, such as Spyder or Visual Studio. From there, you'll be prompted to make two selections: 
@@ -104,7 +105,9 @@ First things first: run the server.py python file. You can do this through a ter
 
 If prompted with a pop-up requesting you to allow Jade access through a firewall or network security system, you should allow access to be granted. Otherwise, the server may be inaccessible to you.
 
-Once everything's ready to go, you can access the server through any web browser of your choosing, such as Google Chrome, Mozilla Firefox, or Microsoft Edge, with the link presented upon the server starting up.
+Once everything's ready to go, you can access the server through any web browser of your choosing, such as Google Chrome, Mozilla Firefox, or Microsoft Edge, with the link presented upon the server starting up. 
+
+In addition, it's always a good idea to check on the Python terminal where you host the server occasionally, especially when dealing with [file saving](#schematic-testing--saving-tools) operations to ensure everything went smoothly and no errors appear. On rare occassions, the output produced by the web interface doesn't quite match up with what the python server is saying. If you end up in this scenario, you should trust the python server's response.
 
 ### Creating Your First Schematic
 
@@ -122,14 +125,16 @@ See below for a visual tutorial utilizing an AND gate.
 
 In addition to the specified inputs in test cases, there are certain inputs reserved by the Jade tool that may prove to be useful for certain assignments. A list of the available reserved inputs is shown below, just name your input accordingly and Jade should recognize it and act accordingly. 
 
-- GND: A connection to ground, equivalent to inputting a 0 bit.
-- VDD: A connection to a power supply, equivalent to inputting a 1 bit.
+- GND: A connection to ground, equivalent to inputting a 0 bit or using the [Ground Connection](#schematic-tools) tool.
+- VDD: A connection to a power supply, equivalent to inputting a 1 bit or using the [Power Supply Connection](#schematic-tools) tool.
 
 ### Handling Multi-Bit Values
 
 By default, all inputs are assumed to be one-bit values: 0s or 1s. Similarly, all output values by default are assumed to be a singular "L" for low or "H" for high (representing a binary 0 and 1 respectively). However, there are some cases where you'll need to work with multi-bit inputs and outputs. For instance, the test for a module may declare a 32-bit input, and your schematic will need to account for all 32 bits. 
 
-Multi-bit functionality can be achieved by modifying the naming of various inputs and outputs. Assuming each input/output of a gate has the same number of bits (or a multiple of the largest mutli-bit value in the gate), the gates will automatically duplicate to account for the increased bit width, so no need to rename the gates, but it may be helpful to double click on the connections between elements to specify the updated bit width.
+Multi-bit functionality can be achieved by modifying the naming of various inputs and outputs. Assuming each input/output of a gate has the same number of bits, the gates will automatically duplicate to account for the increased bit width, so no need to rename the gates, but it may be helpful to double click on the connections between elements to specify the updated bit width. 
+
+The exception to this is the multiplexer (mux), which requires a unique 1 or 2-bit 'select' input for a 2-way or 4-way multiplexer respectively (usually the connection on the bottom of the multiplexer). The select input is typically duplicated alongside the gate itself to match the bit width of the data inputs and the output. In other words, if you have a 4-way multiplexer with 32-bit data inputs, a 2-bit select input, and a 32-bit output, you should end up with 32 4-way multiplexer instances, where each instance has 1-bit data inputs, the original 2-bit select input, and 1-bit outputs.
 
 Here's the rundown of how you can use the naming scheme to leverage this functionality...
 
@@ -190,7 +195,7 @@ If you run into an issue not listed below, be sure to reach out to your course s
 
 ### Python Program Errors
 - "ConnectionAbortedError: [WinError10053] An established connection was aborted by software in your host machine"
-   - This error message can be safely ignored. This is suspected to be due to adblock software in the browser, but testing seems to suggest the functionality of the program is not impacted.
+   - This error message can be safely ignored. This is suspected to be due to adblock software in the browser or internal software in the host device, but testing seems to suggest the functionality of the program is not impacted.
 - OSError: [WinError 10048] Only one usage of each socket address (protocol/network address/port) is normally permitted
    - One possible issue is that you already have a program (possibly Jade!) running on the specified port. Make sure to close out any existing programs running on the port before trying again, or alternatively, use another open port. Ports 3000, 8080, and 8000 are common, but most ports above 1024 are generally accessible to user programs.
    - Another known issue with Linux / WSL is that the python program handling the web server takes longer than ideal to exit. Fortunately, this python process seems to remove itself after a minute or two of waiting. Alternatively, if you're sure no other instances of Jade are running, you can run Jade on a different port without issue.
