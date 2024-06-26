@@ -6,13 +6,20 @@ const { exit } = require('process');
 function do_express_test() {
     var test,netlist;
     if (process.argv[2] === undefined || process.argv[3] === undefined) {
-        console.log('Usage: node tester.js <test_file> <netlist_file>');
+        console.log('USAGE: node tester.js <test_file> <netlist_file>');
         exit(1);
     } else {
-        test = fs.readFileSync(process.argv[2], 'utf8').replace(/\\\\/g, '\\');
-        netlist = JSON.parse(fs.readFileSync(process.argv[3], 'utf8'));
+        console.log('INFO: Running express test...');
+        console.log('INFO: Test File: '+process.argv[2]);
+        console.log('INFO: Netlist File: '+process.argv[3]);
+        try {
+            test = fs.readFileSync(process.argv[2], 'utf8').replace(/\\\\/g, '\\');
+            netlist = JSON.parse(fs.readFileSync(process.argv[3], 'utf8'));
+        } catch (e) {
+            console.log('ERROR: '+e);
+            exit(1);
+        }
     }
-    console.log('Running express test with test file: '+process.argv[2]);
     //var test2 = ".power Vdd=1\n.thresholds Vol=0 Vil=0.1 Vih=0.9 Voh=1\n\n.group inputs A B\n.group outputs Y\n\n.mode gate\n\n.cycle assert inputs tran 99n sample outputs tran 1n\n\n1 1 L\n\n      \n.plot X(A)\n.plot X(B)\n.plot X(Y)"
     //var netlist2 = [{"type":"nand2","connections":{"z":"y","b":"b","a":"a"},"properties":{"name":"nand2_1","tcd":1e-11,"tpd":3e-11,"tr":4500,"tf":2800,"cin":4e-15,"size":10}}];
     try {
@@ -236,8 +243,9 @@ function express_test(source,netlist) {
     if (tests.length == 0) errors.push('No tests specified!');
 
     if (errors.length != 0) {
-        msg = '<li>'+errors.join('<li>');
-        test_result = 'Error detected: invalid test specification'+msg;
+        msg = errors.join('\n');
+        test_result = 'Error detected: '+msg;
+        console.log('ERROR: '+test_result);
         process.exitCode = 1;
         return;
     }
@@ -559,7 +567,7 @@ function express_test(source,netlist) {
     try {
         if (mode == 'device') {
             // Device simulation not currently supported in express mode.
-            console.log('Express Test does not currently support device simulation.')
+            console.log('ERROR: Express Test does not currently support device simulation.')
             throw 'Express Test does not currently support device simulation.';
         } else if (mode == 'gate') {
             gatesim.transient_analysis(netlist, time, Object.keys(sampled_signals), process_results, {});
@@ -567,8 +575,9 @@ function express_test(source,netlist) {
         } else 
             throw 'Unrecognized simulation mode: '+mode;
     } catch (e) {
-        test_result = 'Error detected running simulation:<p>'+e;
-        console.log('ERROR: Express Test Finished with Errors.');
+        test_result = 'Error detected running simulation: '+e;
+        console.log('ERROR: '+test_result);
+        console.log('INFO: Express Test Finished with Errors.');
         process.exitCode = 1;
         setTimeout(function() {}, 1000);
         return;

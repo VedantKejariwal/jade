@@ -732,7 +732,7 @@
                 if (!this.network.options.timing_analysis) {
                     var connections = [];
                     this.fanouts.forEach(function (d,index) { connections.push(d.name); });
-                    throw 'Node ' + this.name + ' is not connected to any output<br>but is an input to the following devices:<li>'+connections.join('<li>');
+                    throw 'Node ' + this.name + ' is not connected to any output but is an input to the following devices:\n'+connections.join('\n');
                 }
             } else return;  // no drivers, no fanouts... not interesting :)  
         }
@@ -759,9 +759,9 @@
             d = this.drivers[i];
             if (!d.tristate(this)) {
                 // shorting together non-tristate outputs, so complain
-                var msg = 'Node ' + this.name + ' is driven by multiple gates.  See devices:<br>';
+                var msg = 'Node ' + this.name + ' is driven by multiple gates.  See devices:\n';
                 for (var j = 0; j < ndrivers; j += 1)
-                    msg += '<li>'+this.drivers[j].name;
+                    msg += '\n'+this.drivers[j].name;
                 throw msg;
             }
             // cons up a new node and have this device drive it
