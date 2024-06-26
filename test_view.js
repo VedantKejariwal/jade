@@ -90,6 +90,12 @@ jade_defs.test_view = function(jade) {
 
     function extract_netlist(diagram) {
         var module = diagram.aspect.module;
+        let default_name = module.get_name().replace(/\//g,'-').substr(1) + '-netlist.json'
+        let netlist_filename = prompt('Enter the name of the file to save to:', default_name);
+        if (netlist_filename === null) {
+            alert('Netlist extraction cancelled.');
+            return;
+        }
         if (module) {
             var globals = Object.getOwnPropertyNames({});  // all the power supplies are global
             globals.push('gnd');
@@ -99,14 +105,14 @@ jade_defs.test_view = function(jade) {
                     url: url,
                     type: 'POST',
                     dataType: 'text',
-                    data: {key: window.location.pathname, netlist: JSON.stringify(netlist), netlist_name: module.get_name()},
+                    data: {key: window.location.pathname, netlist: JSON.stringify(netlist), netlist_name: netlist_filename},
                     error: function(jqXHR, textStatus, errorThrown) {
                         console.log('Error: '+jqXHR.responseText);
                         alert('Error: '+jqXHR.responseText);
                     },
                     success: function(result) {
                         //localStorage.setItem(window.location.pathname,result);
-                        alert('Netlist uploaded to file '+module.get_name().replace(/\//g,'-').substr(1) + '-netlist.json');
+                        alert('Netlist uploaded to file '+netlist_filename+'.');
                     }
                 };
                 $.ajax(args);

@@ -88,6 +88,7 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
         netlist = postvars.get('netlist',[None])[0] # netlist contents to save
         netlist_name = postvars.get('netlist_name',[None])[0] # name of new netlist file to save
         module = postvars.get('module',[None])[0] # name of module to save for module upload
+        module_filename = postvars.get('module_filename',[None])[0] # name of new file to save for module upload
         combine_name = postvars.get('combine_name',[None])[0] # name of new file to save for module combination
         files = postvars.get('files',[None])[0] # list of files to combine
         extra = postvars.get('extra',[None])[0] # additional info as needed for file combination
@@ -98,25 +99,28 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
             global jsonfile
             # Netlist Extraction
             if (netlist is not None and netlist_name is not None):
-                netlist_name = netlist_name.replace('/','-')[1:] + '-netlist.json'
-                print("INFO: Saving netlist to file: ",netlist_name)
-                with open(netlist_name,'w') as f:
-                    f.write(netlist)
+                try:
+                    print("INFO: Saving netlist to file: ",netlist_name)
+                    with open(netlist_name,'w') as f:
+                        f.write(netlist)
+                except Exception as e:
+                    self.generate_error(e, 400)
+                    print("ERROR: Netlist Extraction Failed.")
             # Module Extraction
             elif (module is not None):
                 try:
-                    self.module_extraction(module)
+                    self.module_extraction(module, module_filename)
                 except Exception as e:
-                    print("ERROR: Could not save module info", e)
                     self.generate_error(e, 400)
+                    print("ERROR: Module Extraction Failed.")
             # Module/File Combination
             elif (combine_name is not None and files is not None):
                 try:
                     self.module_combination(combine_name, files, extra)
                     return
                 except Exception as e:
-                    print("ERROR: Could not combine files:",e)
                     self.generate_error(e, 400)
+                    print("ERROR: Module Combination Failed")
             # JSON Switcher
             elif (name is not None):
                 savedFile = jsonfile
@@ -188,7 +192,7 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
         '': 'application/octet-stream', # Default
     })
 
-    def module_extraction(self, module):
+    def module_extraction(self, module, module_filename):
         jsoncontent = {}
         with open(jsonfile,'r') as jsonfile_FP:
             jsoncontent = json.load(jsonfile_FP)
@@ -200,12 +204,11 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
         inner_data["state"] = {k: v for k, v in inner_data["state"].items() if k == module}
         
         jsoncontent["/jade.html"] = json.dumps(inner_data)
-        new_file_name = module.replace('/','-')[1:] + '-save.json'
         
-        with open(new_file_name,'w') as f:
+        with open(module_filename,'w') as f:
             f.write(json.dumps(jsoncontent))
         
-        print("INFO: Saved module info to file: ",new_file_name)
+        print("INFO: Saved module info to file: ",module_filename)
 
     def module_combination(self, file_name, files, extra):
         module_names = {}

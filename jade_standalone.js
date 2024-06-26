@@ -144,11 +144,17 @@ jade_defs.services = function (jade) {
     jade.module_upload = function (j,url) {
         if (url === undefined) url = j.configuration.cloud_url;
         const requestTime = Date();
+        let default_name = j.module['name'].replace(/\//g,'-').substr(1) + '-save.json'
+        let module_filename = prompt('Enter the name of the file to save to:', default_name);
+        if (module_filename === null) {
+            alert('Module extraction cancelled.');
+            return;
+        }
         var args = {
             url: url,
             type: 'POST',
             dataType: 'text',
-            data: {key: window.location.pathname, value: JSON.stringify(j.get_state()), module: j.module['name']},
+            data: {key: window.location.pathname, value: JSON.stringify(j.get_state()), module: j.module['name'], module_filename: module_filename},
             error: function(jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status == 0) { // server not running
                     alert(
@@ -164,7 +170,7 @@ jade_defs.services = function (jade) {
                 }
             },
             success: function(result) {
-                alert('Module saved to file '+j.module['name'].replace(/\//g,'-').substr(1) + '-save.json');
+                alert('Module saved to file '+module_filename);
             }
         };
         $.ajax(args);
