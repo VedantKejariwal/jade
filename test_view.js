@@ -96,6 +96,9 @@ jade_defs.test_view = function(jade) {
             alert('Netlist extraction cancelled.');
             return;
         }
+        if (netlist_filename.slice(-5) !== '.json') {
+            netlist_filename += '.json';
+        }
         if (module) {
             var globals = Object.getOwnPropertyNames({});  // all the power supplies are global
             globals.push('gnd');

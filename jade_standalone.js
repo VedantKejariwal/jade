@@ -150,6 +150,9 @@ jade_defs.services = function (jade) {
             alert('Module extraction cancelled.');
             return;
         }
+        if (module_filename.slice(-5) !== '.json') {
+            module_filename += '.json';
+        }
         var args = {
             url: url,
             type: 'POST',
