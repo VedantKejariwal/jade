@@ -240,7 +240,7 @@
             if (component.type == 'connect') {
                 // collect all the names to be aliased
                 var c = [];
-                $.each(component.connections,function (id,name) { c.push(name); });
+                component.connections.forEach(function (name,id) { c.push(name); });
 
                 // do pair-wise aliasing with first name on list
                 for (var j = 1; j < c.length; j += 1)
