@@ -77,8 +77,8 @@ This is a working document and will be updated as new functionality is added and
 **IMPORTANT: All of the tools in this section that save files to the device will completely overwrite any existing file matching the file's name, so be sure to double check your files and make any copies as needed prior to performing the operation.**
 
 1. **Test**: Run the current module's test and display the result of the test.
-2. **Extract Netlist**: Exports the netlist of the current module to a file, typically formatted as `user-untitled-netlist.json` for example, where user-untitled represents module "/user/untitled". May be required for submitting some assignments in CS210.
-3. **Save Module to File**: Save the current module to a file, typically formatted as `user-untitled-save.json` for example, where user-untitled represents module "/user/untitled". Useful for creating isolated copies of individual modules.
+2. **Extract Netlist**: Exports the netlist of the current module to a file, typically formatted as `user-untitled-netlist.json` by default, where user-untitled represents module "/user/untitled". May be required for submitting some assignments in CS210.
+3. **Save Module to File**: Save the current module to a file, typically formatted as `user-untitled-save.json` by default, where user-untitled represents module "/user/untitled". Useful for creating isolated copies of individual modules.
 4. **Combine Modules**: Select one or more files and consolidate all of their modules into a new JSON file with a name of your choosing. Existing files are unchanged.
 
 ### Schematic Viewer Tools
@@ -90,7 +90,7 @@ This is a working document and will be updated as new functionality is added and
 
 ## How to Do Stuff on Your Server
 
-If you're reading this message, then you've likely already completed the first step of downloading or cloning the repository from GitHub. With that, you should have all the files needed to get things started.
+If you're reading this message, then you've likely already completed the first step of downloading or cloning the repository from GitHub. If not, check out PS0B for instructions on how to download / clone this repository. With that, you should have all the files needed to get things started.
 
 The only requirement is to make sure you have some version of Python 3 installed on your system in order to run the server. At time of writing, Python 3.13 is currently not supported with this program due to compatibility issues.
 
@@ -210,13 +210,15 @@ If you run into an issue not listed below, be sure to reach out to your course s
 
 - I can't see any of my gates on the right hand side!
    - This is a known issue with Jade's resizing mechanism. Fortunately an easy fix: Zoom in/out your browser window, even by just 10%. This should make the gates panel visible.
+- Using Ctrl-C / Ctrl-V / Ctrl-X (or the Cmd equivalents) isn't working!
+   - This is a known issue with Jade, where the keyboard shortcuts aren't recognized on occassion. Fortunately, using the provided Cut / Copy / Paste buttons in the toolbar should work without issue.
 - Node is driven by multiple gates
    - This typically means there is a mismatch between the number of bits being used as an input/output. Make sure that all inputs/outputs of a gate have the same number of bits. It might also be helpful to change the bit width of the connections by double-clicking on the connections between inputs/outputs/gates and specifying the bit width manually.
 - Node is not connected to any output, but is an input to the following devices
    - Typically, this error means that some gate/input is in use in your schematic, but never ultimately makes it to an output. Double check your connections with the involved nodes.
    - There are some odd instances where this issue will appear despite the involved node being connected properly at first glance, typically when 'fanouts' exist in your schematic, also known as when the output of one gate is being used as the input for two or more outputs/gates. We recommend removing these fanouts and instead creating duplicate input/output/gates where possible. For connecting inputs directly to outputs, place a buffer (the inverters without the circle in front) or a jumper (the squiggly line thing, next to the I/O port in the toolbar) in between them. The test will ensure the necessary data for an input goes to all applicable input ports in your schematic.
-Number of connections for terminal X of submodule not a multiple of Y
-   - Ideally, make sure all of your inputs/outputs for a gate/submodule have the same size / bit width (though it does seem like you can have some inputs be a multiple of the total number, in which case Jade will duplicate that input as necessary to make it compatible).
+- Number of connections for terminal X of submodule not a multiple of Y
+   - Ideally, make sure all of your inputs/outputs for a gate/submodule have the same size / bit width, with the exception of multiplexers (though it does seem like you can have some inputs be a multiple of the total number, in which case Jade will duplicate that input as necessary to make it compatible).
 - Node has conflicting set of labels
    - This is typically caused by trying to pass in more than one input to a single input terminal of a gate or submodule. If you're trying to work with multi-bit values, check [this](#handling-multi-bit-values) section out.
 - Test #: Expected output=H/L at TIMEns.
