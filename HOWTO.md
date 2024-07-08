@@ -16,6 +16,7 @@ This is a working document and will be updated as new functionality is added and
    - [Schematic Viewer Tools](#schematic-viewer-tools)
 2. [How to Do Stuff on Your Server](#how-to-do-stuff-on-your-server)
    - [Starting The Server](#starting-the-server)
+      - [A Note About The Client-Server Model](#a-note-about-the-client-server-model)
    - [Creating Your First Schematic](#creating-your-first-schematic)
    - [Special Inputs](#special-inputs)
    - [Handling Multi-Bit Values](#handling-multi-bit-values)
@@ -108,6 +109,18 @@ If prompted with a pop-up requesting you to allow Jade access through a firewall
 Once everything's ready to go, you can access the server through any web browser of your choosing, such as Google Chrome, Mozilla Firefox, or Microsoft Edge, with the link presented upon the server starting up. 
 
 In addition, it's always a good idea to check on the Python terminal where you host the server occasionally, especially when dealing with [file saving](#schematic-testing--saving-tools) operations to ensure everything went smoothly and no errors appear. On rare occassions, the output produced by the web interface doesn't quite match up with what the python server is saying. If you end up in this scenario, you should trust the python server's response.
+
+#### A Note About The Client-Server Model
+
+You might be asking yourself "what's going on here?".
+
+This is a very simple example of a client-server model, a common method of sending information between two or more devices. In this model, a client sends requests (and optionally, a data "payload") from your web browser to the server, indicating what kind of processing you want the server to do or what kind of information you want to retrieve from it. For Jade, this includes requests such as fetching the current state, updating the current state, creating a netlist/save file, etc. 
+
+Once a request is received and is ready to be processed by the server, it will perform the necessary processing and return a response to the client, typically with a response code and possibly additional information. For Jade, this might include fetching the current state from the disk and sending it to the client, or creating a new file on the disk from information provided by the client. 
+
+Check out [this](https://http.cat/) link for some fun cat images and an explanation as to what many of the HTTP status codes mean. Furthermore, see the below diagram that highlights how the client-server model operates.
+
+![Client-Server Model](./howto_imgs/client-server-model.png)
 
 ### Creating Your First Schematic
 
