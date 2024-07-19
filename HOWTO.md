@@ -10,6 +10,7 @@ This is a working document and will be updated as new functionality is added and
 1. [The Tools](#The-Tools)
    - [File Tools](#file-tools)
    - [JSON File Switcher](#json-file-switcher)
+   - [JSON Backups](#json-backups)
    - [Views](#views)
    - [Schematic Tools](#schematic-tools)
    - [Schematic Testing / Saving Tools](#schematic-testing--saving-tools)
