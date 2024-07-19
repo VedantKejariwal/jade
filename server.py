@@ -17,6 +17,11 @@ import cgi
 import json
 import atexit
 import urllib
+import datetime
+import time
+import threading
+
+autosave = False
 
 jsonfile = input("Enter the name of the json file to use (leave blank for default 'labs.json'): ")
 if jsonfile == '': jsonfile = 'labs.json'
@@ -92,11 +97,14 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
         combine_name = postvars.get('combine_name',[None])[0] # name of new file to save for module combination
         files = postvars.get('files',[None])[0] # list of files to combine
         extra = postvars.get('extra',[None])[0] # additional info as needed for file combination
+        get_autosave = postvars.get('get_autosave',[None])[0] # request for autosave state
+        set_autosave = postvars.get('set_autosave',[None])[0] # desired autosave state
         self.log_message('%s',json.dumps([key,value]))
         
         # read json file with user's state
         try: 
             global jsonfile
+            global autosave
             # Netlist Extraction
             if (netlist is not None and netlist_name is not None):
                 try:
@@ -126,6 +134,28 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
                 savedFile = jsonfile
                 jsonfile = name
                 print(f"INFO: Switching to JSON file {jsonfile}")
+            elif (set_autosave is not None):
+                set_autosave = str(set_autosave).upper()
+                if (set_autosave == "TRUE"):
+                    autosave = True
+                    print("INFO: JSON Backups enabled")
+                elif (set_autosave == "FALSE"):
+                    autosave = False
+                    print("INFO: JSON Backups disabled")
+                else:
+                    print("ERROR: Invalid JSON Backups value.")
+                    self.generate_error("Invalid JSON Backups value.", 400)
+            elif (get_autosave is not None):
+                response = {"backups_enabled": autosave}
+                response = json.dumps(response)
+                if (type(response) == str):
+                    response = response.encode('utf-8')
+                self.send_response(200)
+                self.send_header("Content-type", 'text/plain')
+                self.send_header("Content-Length", str(len(response)))
+                self.end_headers()
+                self.wfile.write(response)
+                return
             # Used in all operations, particularly when updating current state
             with open(jsonfile,'r') as f:
                 labs = json.load(f)
@@ -310,6 +340,30 @@ def cleanup():
   httpd.shutdown()
   print("INFO: CLEANED UP")
 
+def autosave_task():
+    global autosave
+    global jsonfile
+    while True:
+        time.sleep(300) # 5 minutes
+
+        if autosave == True:
+            with open(jsonfile,'r') as f:
+                labs = json.load(f)
+            if not os.path.exists("autosave"):
+                os.makedirs("autosave")
+
+            backup_files = [f for f in os.listdir("autosave") if f.startswith("autosave-" + jsonfile.split('.')[0])]
+            num_files = len(backup_files)
+            if num_files >= 5:
+                oldest_file = min(backup_files, key=lambda f: os.path.getctime(os.path.join("autosave/", f)))
+                os.remove("autosave/" + oldest_file)
+
+            autosave_filename = "autosave/autosave-" + jsonfile.split('.')[0] + "-" + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".json"
+            with open(autosave_filename,'w') as f:
+                json.dump(labs,f)
+            
+            print("INFO: Autosave created at", autosave_filename)
+
 if (os.path.exists(jsonfile) == False):
     print("ERROR: No JSON file found, are you sure you entered the correct name / directory?")
     exit()
@@ -318,4 +372,7 @@ else:
 atexit.register(cleanup)
 print("INFO: Jade Server: port",PORT)
 print(f"INFO: Access Jade in a web browser here: http://localhost:{PORT}/jade.html")
+autosave_thread = threading.Thread(target=autosave_task)
+autosave_thread.daemon = True
+autosave_thread.start()
 httpd.serve_forever()

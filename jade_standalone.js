@@ -246,6 +246,64 @@ jade_defs.services = function (jade) {
         $.ajax(args);
     };
 
+    jade.get_backup_state = function(j,url,callback) {
+        return new Promise((resolve, reject) => {
+        if (url === undefined) url = j.configuration.cloud_url;
+        const requestTime = Date();
+        var args = {
+            url: url,
+            type: 'POST',
+            dataType: 'text',
+            data: {key: window.location.pathname, get_autosave: "GETAUTOSAVE"},
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == 0) { // server not running
+                    alert(
+                        'ERROR: Could not connect to server. ' +
+                        'Please start the python server again and refresh this page ' +
+                        'to continue. ' +
+                        '\n\nTime of Attempted Backup:\n'+requestTime
+                        );
+                } else { // server running, but error
+                    console.log('Error during backup: '+jqXHR.responseText);
+                    alert('Error during backup: '+jqXHR.responseText);
+                    reject(new Error('Error during backup: '+jqXHR.responseText));
+                }
+            },
+            success: function(result) {
+                let response = JSON.parse(result);
+                let backups_enabled = response["backups_enabled"];
+                resolve(backups_enabled);
+            }
+        };
+        $.ajax(args);
+        });
+    }
+
+    jade.set_backup_state = function(j,url,enabled) {
+        if (url === undefined) url = j.configuration.cloud_url;
+        const requestTime = Date();
+        var args = {
+            url: url,
+            type: 'POST',
+            dataType: 'text',
+            data: {key: window.location.pathname, set_autosave: enabled},
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == 0) { // server not running
+                    alert(
+                        'ERROR: Could not connect to server. ' +
+                        'Please start the python server again and refresh this page ' +
+                        'to continue. ' +
+                        '\n\nTime of Attempted Backup:\n'+requestTime
+                        );
+                } else { // server running, but error
+                    console.log('Error during backup: '+jqXHR.responseText);
+                    alert('Error during backup: '+jqXHR.responseText);
+                }
+            }
+        };
+        $.ajax(args);
+    }
+
     jade.unsaved_changes = function(which) {
     };
 

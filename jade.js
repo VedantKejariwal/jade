@@ -99,6 +99,27 @@ jade_defs.top_level = function(jade) {
 
         this.file_select = this.top_level.find('#file-select');
         this.file_select.append('<span>Change JSON File:</span><input id="file-select-input" type="file" accept=".json">');
+        this.file_select.append('<br/>');
+
+        // Define the async function as an arrow function to inherit 'this' from the outer scope
+        let checkBackupState = async () => {
+            try {
+                backups_enabled = await jade.get_backup_state($('.jade')[0].jade, window.location.origin);
+                if (backups_enabled) {
+                    this.file_select.append('<label for="autosaveCheckbox">Enable JSON Backups: </label><input type="checkbox" id="autosaveCheckbox" checked>');
+                } else {
+                    this.file_select.append('<label for="autosaveCheckbox">Enable JSON Backups: </label><input type="checkbox" id="autosaveCheckbox">');
+                }
+
+                $('#autosaveCheckbox').on('change',function () {
+                    jade.set_backup_state($('.jade')[0].jade, window.location.origin, this.checked);
+                });
+
+            } catch (error) {
+                console.error('Failed to get backup state:', error);
+            }
+        };
+        checkBackupState.call(this); // Call the function with 'this' context
 
         this.multi_file_select = this.top_level.find('#multi-file-select');
         this.multi_file_select.append('<span>Combine Modules/Files into Single File:</span><input id="multi-file-select-input" type="file" accept=".json" multiple>');
@@ -1878,3 +1899,6 @@ jade_defs.global_check = function () {
     }
     return differences;
 };
+
+//////////////////////////////////////////////////////////////////////
+////
