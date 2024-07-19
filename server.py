@@ -21,7 +21,8 @@ import datetime
 import time
 import threading
 
-autosave = False
+# default to backing up JSON files.
+autosave = True
 
 jsonfile = input("Enter the name of the json file to use (leave blank for default 'labs.json'): ")
 if jsonfile == '': jsonfile = 'labs.json'

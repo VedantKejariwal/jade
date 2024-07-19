@@ -44,6 +44,15 @@ This is a working document and will be updated as new functionality is added and
 
 - **IMPORTANT: All JSON files being used with Jade should be stored in the same directory where Jade's files are located. In addition, avoid using JSON files not intended for use with Jade. Failure to do so may lead to unexpected behavior.**
 
+### JSON Backups
+![JSON Backups](./howto_imgs/json-backups.png)
+
+- In addition to the automatic file saving features of Jade, in case something goes wrong or you want to go back to an earlier point, you can enable this feature to have Jade start saving copies of your current save state that will be stored in an `autosaves` directory, with the filename containing the filename of the current JSON file as well as the date and time the backup was created.
+
+- In its current implementation, there is a maximum of 5 backups of each JSON file, with rolling backups occurring every 5 minutes. If there already exists 5 backups, the oldest file will be deleted to make space for the new backup.
+
+- This feature is **enabled** by default, but can be turned off at any time if you prefer.
+
 ### Views
 ![Views](./howto_imgs/views.png)
 - **Schematic**: Your main working area, this is where you can utilize analog and gate devices to build your circuits.
