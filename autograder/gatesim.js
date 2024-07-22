@@ -275,19 +275,9 @@
                 new Storage(network, name, type, connections, properties);
             }
             else if (type == 'memory') {
-                // convert node names to Nodes
-                $.each(properties.ports, function (i, port) {
-                    $.each(port.addr, function (j,name) { port.addr[j] = network.node(name); });
-                    $.each(port.data, function (j,name) { port.data[j] = network.node(name); });
-                    // make a separate list of output nodes so that tristate buses can successfully
-                    // insert BUS devices on the outputs without affecting the input ndoes
-                    port.data_out = port.data.slice(0);
-                    port.clk = network.node(port.clk);
-                    port.wen = network.node(port.wen);
-                    port.oe = network.node(port.oe);
-                });
-
-                new Memory(network, name, properties, options);
+                //Memory components not currently supported in express mode.
+                console.log('ERROR: Express Test does not currently support memory components.')
+                throw 'Express Test does not currently support memory components.';
             }
             else if (type == 'constant0' || type == 'constant1') {
                 n = connections.z;
