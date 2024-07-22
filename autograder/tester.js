@@ -40,7 +40,7 @@ function express_test(source,netlist) {
 
     var i,j,k,v;
     var repeat = 1;
-    var mode = 'device';  // which simulation to run
+    var mode = 'gate';  // which simulation to run
     var plots = [];     // list of signals to plot
     var tests = [];     // list of test lines
     var mverify = {};   // mem name -> [value... ]
@@ -317,97 +317,15 @@ function express_test(source,netlist) {
         });
     });
 
-    if (mode == 'device')
+    if (mode == 'device') {
         // How did we get here if we don't support device simulation?
-        build_inputs_device(netlist,driven_signals,thresholds);
-    else if (mode == 'gate')
+        console.log('ERROR: Express Test does not currently support device simulation.');
+        throw 'Express Test does not currently support device simulation.';
+    } else if (mode == 'gate')
         build_inputs_gate(netlist,driven_signals,thresholds);
     else throw 'Unrecognized simulation mode: '+mode;
     //console.log('stop time: '+time);
     //jade.netlist.print_netlist(netlist);
-
-    function multibit_to_int(dataset) {
-        // first merge all the nodes in the dataset into a single
-        // set of xvalues and yvalues, where each yvalue is an array of
-        // digital values from the component nodes
-        var xv = [];
-        var yv = [];
-        var vil = thresholds.Vil || 0.2;
-        var vih = thresholds.Vih || 0.8;
-        var nnodes = dataset.xvalues.length;  // number of nodes
-        var i,nindex,vindex,x,y,last_y,xvalues,yvalues,nvalues,type;
-        for (nindex = 0; nindex < nnodes; nindex += 1) {
-            xvalues = dataset.xvalues[nindex];
-            yvalues = dataset.yvalues[nindex];
-            nvalues = xvalues.length;
-            type = dataset.type[nindex];
-            i = 0;  // current index into merged values
-            last_y = undefined;
-            for (vindex = 0; vindex < nvalues; vindex += 1) {
-                x = xvalues[vindex];
-                y = yvalues[vindex];
-
-                // convert to a digital value if necessary
-                if (type == 'analog') y = (y <= vil) ? 0 : ((y >= vih) ? 1 : 2);
-
-                // don't bother if node already has this logic value
-                // unless it's the final time point, which we need to keep
-                if (vindex != nvalues-1 && y == last_y) continue;
-
-                // skip over merged values till we find where x belongs
-                while (i < xv.length) {
-                    if (xv[i] >= x) break;
-                    // add new bit to time point we're skipping over
-                    yv[i][nindex] = last_y;  
-                    i += 1;
-                }
-
-                if (xv[i] == x) {
-                    // exact match of time with existing time point, so just add new bit
-                    yv[i][nindex] = y;
-                } else {
-                    // need to insert new time point, copy previous time point, if any
-                    // otherwise make a new one from scratch
-                    var new_value;
-                    if (i > 0) new_value = yv[i-1].slice(0);  // copy previous one
-                    else new_value = new Array();
-                    new_value[nindex] = y;
-                    // insert new time point into xv and yv arrays
-                    xv.splice(i,0,x);
-                    yv.splice(i,0,new_value);
-                }
-
-                // all done! move to next value to merge
-                last_y = y;    // needed to fill in entries we skip over
-            }
-
-            // propagate final value through any remaining elements
-            while (i < xv.length) {
-                // add new bit to time point we're skipping over
-                yv[i][nindex] = last_y;  
-                i += 1;
-            }
-        }
-
-        // convert the yv's to integers or undefined, then format as specified
-        for (vindex = 0; vindex < yv.length; vindex += 1) {
-            yvalues = yv[vindex];
-            y = 0;
-            // NB. doesn't work when nnodes > 53 (max javascript integer)
-            // **** fix someday
-            for (nindex = 0; nindex < nnodes; nindex += 1) {
-                i = yvalues[nindex];
-                if (i === 0 || i == 1) y = y*2 + i;
-                else if (i == 3) y = -1;  // < 0 means Z
-                else { y = undefined; break; }
-            }
-            yv[vindex] = y;
-        }
-        dataset.xvalues = xv;
-        dataset.yvalues = yv;
-        dataset.nnodes = nnodes;
-        return dataset;
-    }
 
     // verify results against values specified by test
     function verify_results(results) {
@@ -449,14 +367,8 @@ function express_test(source,netlist) {
             // check observed value vs. expected value
             if (mode == 'device') {
                 // How did we get here if we don't support device simulation?
-                v = history === undefined ? undefined : jade.device_level.interpolate(test.t, history.xvalues, history.yvalues);
-                if (v === undefined ||
-                    (test.v == 'L' && v > thresholds.Vil) ||
-                    (test.v == 'H' && v < thresholds.Vih)) {
-                    errors.push('Test '+test.i.toString()+': Expected '+test.n+'='+test.v+
-                                ' at '+utils.engineering_notation(test.t,2)+'s.');
-                    t_error = test.i;
-                }
+                console.log('ERROR: Express Test does not currently support device simulation.');
+                throw 'Express Test does not currently support device simulation.';
             }
             else if (mode == 'gate') {
                 v = history === undefined ? undefined : gatesim.interpolate(test.t, history.xvalues, history.yvalues);
@@ -583,73 +495,6 @@ function express_test(source,netlist) {
         return;
     }
 };
-
-function build_inputs_device(netlist,driven_signals,thresholds) {
-    // add pullup and pulldown FETs for driven nodes, connected to sources for Voh and Vol
-    netlist.push({type: 'voltage source',
-                  connections:{nplus: '_voh_', nminus: 'gnd'},
-                  properties:{name: '_voh_source', value:{type:'dc',args:[thresholds.Voh]}}});
-    netlist.push({type: 'voltage source',
-                  connections:{nplus: '_vol_', nminus: 'gnd'},
-                  properties:{name: '_vol_source', value:{type:'dc',args:[thresholds.Vol]}}});
-    Object.keys(driven_signals).forEach(function(node,index) {
-        netlist.push({type:'pfet',
-                      connections:{d:'_voh_', g:node+'_pullup', s:node},
-                      properties:{W:100, L:1,name:node+'_pullup'}});
-        netlist.push({type:'nfet',
-                      connections:{d:node ,g:node+'_pulldown', s:'_vol_'},
-                      properties:{W:100, L:1,name:node+'_pulldown'}});
-    });
-
-    // construct PWL voltage sources to control pullups/pulldowns for driven nodes
-    Object.keys(driven_signals).forEach(function(tvlist,node) {
-        var pulldown = [0,thresholds.Vol];   // initial <t,v> for pulldown (off)
-        var pullup = [0,thresholds.Voh];     // initial <t,v> for pullup (off)
-        // run through tvlist, setting correct values for pullup and pulldown gates
-        tvlist.foreach(function(tvpair,index) {
-            var t = tvpair[0];
-            var v = tvpair[1];
-            var pu,pd;
-            if (v == '0') {
-                // want pulldown on, pullup off
-                pd = thresholds.Voh;
-                pu = thresholds.Voh;
-            }
-            else if (v == '1') {
-                // want pulldown off, pullup on
-                pd = thresholds.Vol;
-                pu = thresholds.Vol;
-            }
-            else if (v == 'Z') {
-                // want pulldown off, pullup off
-                pd = thresholds.Vol;
-                pu = thresholds.Voh;
-            }
-            else
-                console.log('node: '+node+', tvlist: '+JSON.stringify(tvlist));
-            // ramp to next control voltage over 0.1ns
-            var last_pu = pullup[pullup.length - 1];
-            if (last_pu != pu) {
-                if (t != pullup[pullup.length - 2])
-                    pullup.push.apply(pullup,[t,last_pu]);
-                pullup.push.apply(pullup,[t+0.1e-9,pu]);
-            }
-            var last_pd = pulldown[pulldown.length - 1];
-            if (last_pd != pd) {
-                if (t != pulldown[pulldown.length - 2])
-                    pulldown.push.apply(pulldown,[t,last_pd]);
-                pulldown.push.apply(pulldown,[t+0.1e-9,pd]);
-            }
-        });
-        // set up voltage sources for gates of pullup and pulldown
-        netlist.push({type: 'voltage source',
-                      connections: {nplus: node+'_pullup', nminus: 'gnd'},
-                      properties: {name: node+'_pullup_source', value: {type: 'pwl', args: pullup}}});
-        netlist.push({type: 'voltage source',
-                      connections: {nplus: node+'_pulldown', nminus: 'gnd'},
-                      properties: {name: node+'_pulldown_source', value: {type: 'pwl', args: pulldown}}});
-    });
-}
 
 // add netlist elements to drive input nodes
 // for gate simulation, each input node is connected to a tristate driver

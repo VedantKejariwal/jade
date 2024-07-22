@@ -9,17 +9,6 @@
 
     const utils = require('./utils.js');
 
-    var last_network;  // remember most recent network
-    function get_last_network() { return last_network; }
-
-    function dc_analysis(netlist, sweep1, sweep2, options) {
-        throw "Sorry, no DC analysis with gate-level simulation";
-    }
-
-    function ac_analysis(netlist, fstart, fstop, ac_source_name,options) {
-        throw "Sorry, no AC analysis with gate-level simulation";
-    }
-
     // Transient analysis
     //   netlist: JSON description of the circuit
     //   tstop: stop time of simulation in seconds
@@ -54,94 +43,6 @@
                 progress.finish(e);
             }
         }
-    }
-
-    // return string describing timing results
-    function timing_analysis(netlist,options,maxpaths) {
-        if (options === undefined) options = {};
-        if (maxpaths === undefined) maxpaths = 10;
-
-        options.timing_analysis = true;
-        var network = new Network(netlist, options);
-
-        var analysis;
-        try {
-            analysis = network.get_timing_info();
-        } catch (e) {
-            return "\n\nOops, timing analysis failed:\n"+e;
-        }
-
-        var div_counter = 0;
-        function describe_tpd(from,to,tpd,result) {
-            if (tpd.length == 0) return result;
-
-            if (result) result += '<p><hr><p>';
-            result += 'Worst-case t<sub>PD</sub> from '+from+' to '+to+'\n';
-
-            // sort by pd_sum, longest first
-            tpd.sort(function(tinfo1,tinfo2){ return tinfo2.pd_sum - tinfo1.pd_sum; });
-            for (var i = 0; i < maxpaths && i < tpd.length; i += 1) {
-                tinfo = tpd[i];
-                result += '<p>  t<sub>PD</sub> from '+tinfo.get_tpd_source().name+' to '+tinfo.name+' ('+(tinfo.pd_sum*1e9).toFixed(3)+'ns):';
-                result += ' <button onclick="$(\'#detail'+div_counter+'\').toggle()">Details</button>\n<div id="detail'+div_counter+'" style="display:none;">';
-                result += tinfo.describe_tpd();
-                result += '<br></div>';
-                div_counter += 1;
-            }
-
-            return result;
-        }
-
-        var result = '';
-        var i,node,tinfo,tpd;
-
-        // report timing constraints for each clock
-        $.each(analysis.clocks,function (index,clk) {
-            // collect timing info at each device controlled by clk
-            var th_violations = [];
-            tpd = [];
-            $.each(clk.fanouts,function (index,device) {
-                tinfo = device.get_clock_info(clk);
-                if (tinfo !== undefined) {
-                    var src = tinfo.get_tpd_source().node;
-                    if (src == clk) tpd.push(tinfo);
-                    if (!src.is_input() && tinfo.cd_sum < 0) th_violations.push(tinfo);
-                }
-            });
-
-            // report clk->clk timing contraints
-            result = describe_tpd(clk.name+'\u2191',clk.name+'\u2191',tpd,result);
-
-            // report hold-time violations, if any
-            if (th_violations.length > 0) {
-                if (result) result += '<p><hr><p>';
-                result += 'Hold-time violations for '+clk.name+'\u2191:\n';
-                $.each(th_violations,function (index,tinfo) {
-                    result += '\n  tCD from '+tinfo.get_tcd_source().name+" to "+tinfo.cd_link.name+" violates hold time by "+(tinfo.cd_sum*1e9).toFixed(3)+"ns:\n";
-                    result += tinfo.describe_tcd();
-                });
-            }
-
-            // get tPDs from clk to top-level outputs
-            tpd = [];
-            $.each(analysis.timing,function (node,tinfo) {
-                // only interested in top-level outputs
-                if (tinfo.get_tpd_source().node == clk && tinfo.node.is_output())
-                    tpd.push(tinfo);
-            });
-            result = describe_tpd(clk.name+'\u2191','top-level outputs',tpd,result);
-        });
-
-        // report worst-case combinational paths from inputs to top-level outputs
-        tpd = [];
-        $.each(analysis.timing,function (node,tinfo) {
-            // only interested in top-level outputs
-            if (tinfo.node.is_output() && !tinfo.get_tpd_source().node.clock)
-                tpd.push(tinfo);
-        });
-        result = describe_tpd('inputs','top-level outputs',tpd,result);
-
-        return result;
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -1954,11 +1855,7 @@
     //
     ///////////////////////////////////////////////////////////////////////////////
     module.exports = {
-        'dc_analysis': dc_analysis,
-        'ac_analysis': ac_analysis,
         'transient_analysis': transient_analysis,
-        'timing_analysis': timing_analysis,
-        'get_last_network': get_last_network,
         'interpolate': interpolate
     };
 
