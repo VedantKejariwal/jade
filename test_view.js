@@ -102,7 +102,13 @@ jade_defs.test_view = function(jade) {
         if (module) {
             var globals = Object.getOwnPropertyNames({});  // all the power supplies are global
             globals.push('gnd');
-            netlist = jade.gate_level.diagram_gate_netlist(diagram,globals);
+            try {
+                netlist = jade.gate_level.diagram_gate_netlist(diagram,globals);
+            }
+            catch (e) {
+                alert("Error extracting netlist: \n\n"+e);
+                return;
+            }
             url = diagram.editor.jade.configuration.cloud_url;
                 var args = {
                     url: url,
