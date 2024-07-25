@@ -30,6 +30,7 @@ jade_defs.jade = function() {
     j.gatesim = jade_defs.gatesim(j);
     jade_defs.analog(j);
     jade_defs.gates(j);
+    j.export_mechanisms = jade_defs.export_mechanisms(j);
 };
 
 jade_defs.top_level = function(jade) {

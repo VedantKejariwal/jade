@@ -261,7 +261,7 @@ jade_defs.gate_level = function(jade) {
     }
 
     // add timing analysis to tool bar
-    //jade.schematic_view.schematic_tools.push(['timing', jade.icons.timing_icon, 'Gate-level timing analysis', do_timing]);
+    jade.schematic_view.schematic_tools.push(['timing', jade.icons.timing_icon, 'Gate-level timing analysis', do_timing]);
 
     ///////////////////////////////////////////////////////////////////////////////
     //
