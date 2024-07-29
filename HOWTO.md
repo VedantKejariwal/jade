@@ -88,9 +88,10 @@ This is a working document and will be updated as new functionality is added and
 **IMPORTANT: All of the tools in this section that save files to the device will completely overwrite any existing file matching the file's name, so be sure to double check your files and make any copies as needed prior to performing the operation.**
 
 1. **Test**: Run the current module's test and display the result of the test.
-2. **Extract Netlist**: Exports the netlist of the current module to a file, typically formatted as `user-untitled-netlist.json` by default, where user-untitled represents module "/user/untitled". May be required for submitting some assignments in CS210.
-3. **Save Module to File**: Save the current module to a file, typically formatted as `user-untitled-save.json` by default, where user-untitled represents module "/user/untitled". Useful for creating isolated copies of individual modules.
-4. **Combine Modules**: Select one or more files and consolidate all of their modules into a new JSON file with a name of your choosing. Existing files are unchanged.
+2. **Timing Analysis**: Run an analysis to determine how long it takes for signals to propagate throughout the module.
+3. **Extract Netlist**: Exports the netlist of the current module to a file, typically formatted as `user-untitled-netlist.json` by default, where user-untitled represents module "/user/untitled". May be required for submitting some assignments in CS210.
+4. **Save Module to File**: Save the current module to a file, typically formatted as `user-untitled-save.json` by default, where user-untitled represents module "/user/untitled". Useful for creating isolated copies of individual modules.
+5. **Combine Modules**: Select one or more files and consolidate all of their modules into a new JSON file with a name of your choosing. Existing files are unchanged.
 
 ### Schematic Viewer Tools
 ![Schematic Viewer Tools](./howto_imgs/schematicviewtools.png)
