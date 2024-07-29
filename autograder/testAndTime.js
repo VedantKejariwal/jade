@@ -5,18 +5,23 @@ const { exit } = require('process');
 
 function do_express_test() {
     var test,netlist;
-    if (process.argv[2] === undefined || process.argv[3] === undefined || process.argv[4] === undefined) {
+    if (process.argv[2] === undefined || process.argv[3] === undefined) {
         console.log('USAGE: node tester.js <test_file> <netlist_file> <benchmarkTime');
+        console.log(' benchmarkTime only required for optional timing analysis.');
         exit(1);
     } else {
         console.log('INFO: Running express test...');
         console.log('INFO: Test File: '+process.argv[2]);
         console.log('INFO: Netlist File: '+process.argv[3]);
-        console.log('INFO: Benchmark Time: '+process.argv[4]);
         try {
             test = fs.readFileSync(process.argv[2], 'utf8').replace(/\\\\/g, '\\');
             netlist = JSON.parse(fs.readFileSync(process.argv[3], 'utf8'));
-            benchmarkTime = parseFloat(process.argv[4]);
+            if (process.argv[4] !== undefined) {
+                benchmarkTime = parseFloat(process.argv[4]);
+                console.log('INFO: Timing Analysis Enabled - Benchmark Time: '+process.argv[4]);
+            } else {
+                benchmarkTime = -1;
+            }
         } catch (e) {
             console.log('ERROR: '+e);
             exit(1);
@@ -451,27 +456,32 @@ function express_test(source,netlist,benchmarkTime) {
         } else {
             // Benmark = 1e-10/(size_in_m**2 * simulation_time_in_s)
             var benmark = 1e-10/((results._network_.size*1e-12) * results._network_.time);
-            console.log("INFO: Accuracy Test Complete. Checking Timing Analysis...");
-            
-            // Before giving a pass, we need to check if the largest TPD is less than the benchmark time.
-            try {
-                // Resettting the netlist after changes from testing.
-                let result = timing_analysis(JSON.parse(fs.readFileSync(process.argv[3], 'utf8')),{},10,benchmarkTime);
-                if (result == -1) {
-                    test_result = 'ERROR: Largest TPD is greater than benchmark time.';
+            if (benchmarkTime == -1) {
+                test_result = 'passed '+ +benmark.toString();
+                return;
+            } else {
+                console.log("INFO: Accuracy Test Complete. Checking Timing Analysis...");
+                
+                // Before giving a pass, we need to check if the largest TPD is less than the benchmark time.
+                try {
+                    // Resettting the netlist after changes from testing.
+                    let result = timing_analysis(JSON.parse(fs.readFileSync(process.argv[3], 'utf8')),{},10,benchmarkTime);
+                    if (result == -1) {
+                        test_result = 'ERROR: Largest TPD is greater than benchmark time.';
+                        process.exitCode = 1;
+                        return;
+                    } else {
+                        console.log('INFO: Timing Analysis Complete.');
+                    }
+                } catch (e) {
+                    console.log('ERROR: '+e);
                     process.exitCode = 1;
                     return;
-                } else {
-                    console.log('INFO: Timing Analysis Passed.');
                 }
-            } catch (e) {
-                console.log('ERROR: '+e);
-                process.exitCode = 1;
-                return;
-            }
 
-            test_result = 'passed '+ +benmark.toString();
-            // Exit code is 0 by default.
+                test_result = 'passed '+ +benmark.toString();
+                // Exit code is 0 by default.
+            }
         }
     }
 
