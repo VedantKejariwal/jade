@@ -43,7 +43,7 @@ This is a working document and will be updated as new functionality is added and
 ![JSON Switcher](./howto_imgs/jsonswitcher.png)
 - Some assignments in CS210 may ask you to work with multiple JSON files. You may utilize the built-in JSON switcher in the user interface to switch between different files. Upon choosing a file, your interface should refresh and load the contents of the new JSON file.
 
-- **IMPORTANT: All JSON files being used with Jade should be stored in the same directory where Jade's files are located. In addition, avoid using JSON files not intended for use with Jade. Failure to do so may lead to unexpected behavior.**
+- **IMPORTANT: All JSON files being used with Jade should be stored in the same directory where Jade's files are located (i.e. same directory as server.py). In addition, avoid using JSON files not intended for use with Jade. Failure to do so may lead to unexpected behavior.**
 
 ### JSON Backups
 ![JSON Backups](./howto_imgs/json-backups.png)
@@ -53,6 +53,8 @@ This is a working document and will be updated as new functionality is added and
 - In its current implementation, there is a maximum of 5 backups of each JSON file, with rolling backups occurring every 5 minutes. If there already exists 5 backups, the oldest file will be deleted to make space for the new backup.
 
 - This feature is **enabled** by default, but can be turned off at any time if you prefer.
+
+- To use an autosave file, move/copy it into the main Jade directory (i.e. the same directory as server.py) and either start Jade with that file or use the JSON file switcher.
 
 ### Views
 ![Views](./howto_imgs/views.png)
