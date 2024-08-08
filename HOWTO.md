@@ -109,7 +109,11 @@ If you're reading this message, then you've likely already completed the first s
 The only requirement is to make sure you have some version of Python 3 installed on your system in order to run the server. At time of writing, Python 3.13 is currently not supported with this program due to compatibility issues.
 
 ### Starting The Server
-First things first: run the server.py python file. You can do this through a terminal (seen below) or pressing 'Run' in certain code editors and IDEs, such as Spyder or Visual Studio. From there, you'll be prompted to make two selections: 
+First things first: run the server.py python file. You can do this through a terminal or PowerShell program (seen below) or pressing 'Run' in certain code editors and IDEs, such as Spyder or Visual Studio. 
+
+If you choose to use a terminal / PowerShell program, note that most terminals in code editors set the working directory to be the folder that you currently have opened in the editor (i.e. the extracted Jade folder), but if you notice that the current working directory of your terminal (i.e. C:/Users/arand/jade in the example below) isn't the directory where you extracted Jade into, we recommend running `cd /some/path/here`, where the path can be found by right-clicking on the extracted Jade folder in your file explorer and copying the path. 
+
+From there, you'll be prompted to make two selections: 
 1) the name of the JSON file to load (default: labs.json)
 2) the number of the port to use (default: 8000)
 
