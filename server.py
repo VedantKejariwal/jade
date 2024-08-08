@@ -109,8 +109,12 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
             # Netlist Extraction
             if (netlist is not None and netlist_name is not None):
                 try:
-                    print("INFO: Saving netlist to file: ",netlist_name)
-                    with open(netlist_name,'w') as f:
+                    print("INFO: Saving netlist to file: netlists/",netlist_name)
+                    full_netlist_name = "netlists/" + netlist_name
+                    # make netlists/ directory if needed
+                    if not os.path.exists("netlists"):
+                        os.makedirs("netlists")
+                    with open(full_netlist_name,'w') as f:
                         f.write(netlist)
                 except Exception as e:
                     self.generate_error(e, 400)

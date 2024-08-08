@@ -52,7 +52,7 @@ jade_defs.export_mechanisms = function(jade) {
                     },
                     success: function(result) {
                         //localStorage.setItem(window.location.pathname,result);
-                        alert('Netlist uploaded to file '+netlist_filename+'.');
+                        alert('Netlist uploaded to netlists/'+netlist_filename+'.');
                     }
                 };
                 $.ajax(args);
