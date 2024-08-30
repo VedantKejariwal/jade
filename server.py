@@ -164,6 +164,24 @@ class JadeRequestHandler(BaseHTTPRequestHandler):
             # Used in all operations, particularly when updating current state
             with open(jsonfile,'r') as f:
                 labs = json.load(f)
+        except FileNotFoundError:
+            response = f'Could not find {name}. Is it in the root of the jade/ folder?'
+            self.send_response(422)
+            self.send_header("Content-type", 'text/plain')
+            self.send_header("Content-Length", str(len(response)))
+            self.end_headers()
+            if (type(response) == str):
+                response = response.encode('utf-8')
+            self.wfile.write(response)
+
+            if (name is not None): # JSON Switch failed, revert to saved file
+                jsonfile = savedFile
+                print(f"ERROR: Cannot find {name}. Is it in the root of the jade/ folder? Keeping {savedFile} as the current JSON file")
+                return
+            else: # Initial JSON file is not formatted correctly
+                print(f"ERROR: JSON file {jsonfile} is not formatted correctly. Please check the JSON file and try again.")
+                print("INFO: Terminating server...")
+                exit()
         except json.JSONDecodeError:
             response = 'Bad JSON file format. Please check the JSON file and try again.'
             self.send_response(422)
